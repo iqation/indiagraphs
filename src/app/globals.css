@@ -1,26 +1,120 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  @apply bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-gray-800;
+}
+@keyframes shimmer {
+  0% { background-position: -500px 0; }
+  100% { background-position: 500px 0; }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.glossy {
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.7) 30%,
+    rgba(255, 255, 255, 0.4) 60%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 6s infinite linear;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+ 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out both;
+}
+
+
+body {
+  @apply bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-gray-800;
+}
+@keyframes shimmer {
+  0% { background-position: -500px 0; }
+  100% { background-position: 500px 0; }
+}
+
+.glossy {
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.7) 30%,
+    rgba(255, 255, 255, 0.4) 60%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 6s infinite linear;
+}
+
+ 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out both;
+}
+
+/* --- WordPress Header Dropdown Fix --- */
+
+header,
+#wp-header,
+.site-header {
+  position: relative !important;
+  z-index: 9999 !important;
+}
+
+.site-header ul.sub-menu {
+  position: absolute !important;
+  z-index: 10000 !important;
+}
+
+/* Prevent Next.js containers from trapping z-index layers */
+main, section, div {
+  isolation: isolate;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Make sure WP submenus are always on top */
+.sub-menu,
+.wp-block-navigation__submenu-container {
+  position: absolute !important;
+  z-index: 999999 !important;
+}
+footer {
+  position: relative;
+  z-index: 10;
+}
+
+main {
+  z-index: 0;
+  position: relative;
+}
+main {
+  background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
+}
+
+footer {
+  background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
 }
