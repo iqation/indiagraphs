@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import GraphsHome from "../GraphsHome";
+import GraphsHome from "./GraphsHome";
 
 export const metadata: Metadata = {
   title: "Explore India's Data Through Interactive Graphs",

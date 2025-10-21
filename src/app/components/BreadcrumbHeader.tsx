@@ -9,7 +9,6 @@ export default function BreadcrumbHeader({
   category?: string | null;
   title?: string;
 }) {
-  // Only show category if we have a valid one AND category pages exist
   const hasValidCategory =
     category && category.toLowerCase() !== "uncategorized" && category.trim() !== "";
 
@@ -18,18 +17,18 @@ export default function BreadcrumbHeader({
       className="text-sm text-gray-600 flex flex-wrap items-center gap-1 sm:gap-2 mb-3 sm:mb-5"
       aria-label="Breadcrumb"
     >
-      {/* 🏠 Home */}
-      <Link href="/" className="hover:text-indigo-600 transition">
+      {/* 🏠 Home - Main domain */}
+      <Link href="https://indiagraphs.com" className="hover:text-indigo-600 transition">
         Home
       </Link>
       <ChevronRight size={14} className="text-gray-400" />
 
-      {/* 📊 Graphs main page */}
-      <Link href="/graphs" className="hover:text-indigo-600 transition">
+      {/* 📊 Graphs - Data subdomain */}
+      <Link href="https://data.indiagraphs.com" className="hover:text-indigo-600 transition">
         Graphs
       </Link>
 
-      {/* 🗂️ Category — show only if category pages exist */}
+      {/* 🗂️ Category */}
       {hasValidCategory && (
         <>
           <ChevronRight size={14} className="text-gray-400" />
@@ -37,7 +36,7 @@ export default function BreadcrumbHeader({
         </>
       )}
 
-      {/* 📈 Current page title */}
+      {/* 📈 Graph Title */}
       {title && (
         <>
           <ChevronRight size={14} className="text-gray-400" />

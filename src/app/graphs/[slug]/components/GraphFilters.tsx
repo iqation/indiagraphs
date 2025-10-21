@@ -88,12 +88,16 @@ useEffect(() => {
                            shadow-sm hover:shadow-md focus:ring-2 focus:ring-indigo-300 
                            transition-all cursor-pointer"
               >
-                <option value="">Start FY</option>
-                {allLabels.map((label) => (
-                  <option key={label} value={label}>
-                    {label}
-                  </option>
-                ))}
+               {/* ✅ START YEAR DROPDOWN */}
+<option value="">Start FY</option>
+{[...new Set(allLabels)]
+  .filter((label) => label && label.trim() !== "")
+  .sort()
+  .map((label, index) => (
+    <option key={`${label}-${index}-${Math.random()}`} value={label}>
+      {label}
+    </option>
+  ))}
               </select>
               <Calendar
                 size={16}
@@ -115,12 +119,16 @@ useEffect(() => {
                                : "border-gray-200"
                            }`}
               >
-                <option value="">End FY</option>
-                {allLabels.map((label) => (
-                  <option key={label} value={label}>
-                    {label}
-                  </option>
-                ))}
+                {/* ✅ END YEAR DROPDOWN */}
+<option value="">End FY</option>
+{[...new Set(allLabels)]
+  .filter((label) => label && label.trim() !== "")
+  .sort()
+  .map((label, index) => (
+    <option key={`${label}-${index}-${Math.random()}`} value={label}>
+      {label}
+    </option>
+  ))}
               </select>
               <ArrowRight
                 size={16}

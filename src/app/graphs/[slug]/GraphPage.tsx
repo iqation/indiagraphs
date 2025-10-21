@@ -14,6 +14,7 @@ import GraphStats from "./components/GraphStats";
 import GraphChart from "./components/GraphChart";
 import GraphAbout from "./components/GraphAbout";
 import RelatedGraphs from "./components/RelatedGraphs";
+import { metricBehaviorLogic } from "../../config/metricBehaviorLogic";
 //import IGHeader from "@/app/components/IGHeader";
 
 export default function GraphPage() {
@@ -21,7 +22,7 @@ export default function GraphPage() {
 
   // 🔹 States
   const [graph, setGraph] = useState<any>(null);
-  const [dataset, setDataset] = useState<any>(null);
+  const [dataset, setDataset] = useState<any[]>([]);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [filtered, setFiltered] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,9 @@ export default function GraphPage() {
   const [relatedGraphs, setRelatedGraphs] = useState<
     { title: string; slug: string }[]
   >([]);
+  const [activeDatasetId, setActiveDatasetId] = useState<number | null>(null);
+
+  
 
   // 🚀 Fetch Graph + Dataset + DataPoints
   useEffect(() => {
@@ -50,26 +54,43 @@ export default function GraphPage() {
         if (graphError || !graphData) throw graphError;
         setGraph(graphData);
 
-        // 2️⃣ Dataset
-        const { data: datasetData, error: datasetError } = await supabase
-          .from("datasets")
-          .select("id, name, color, unit, metric_type")
-          .eq("graph_id", graphData.id)
-          .single();
-        if (datasetError || !datasetData) throw datasetError;
-        setDataset(datasetData);
+        // Fetch all datasets (instead of single)
+const { data: datasetData, error: datasetError } = await supabase
+  .from("datasets")
+  .select("id, name, color, unit, metric_type, metric_behavior")
+  .eq("graph_id", graphData.id);
 
-        // 3️⃣ Data points
-        const { data: points, error: pointsError } = await supabase
-          .from("data_points")
-          .select("period_label, value")
-          .eq("dataset_id", datasetData.id)
-          .order("period_start", { ascending: true });
-        if (pointsError) throw pointsError;
+if (datasetError || !datasetData?.length) throw datasetError;
+
+// Save all datasets (array)
+setDataset(datasetData);
+
+// Default active dataset (first)
+setActiveDatasetId(datasetData[0]?.id || null);
+
+
+
+        // Fetch data points for all datasets
+const { data: points, error: pointsError } = await supabase
+  .from("data_points")
+  .select("dataset_id, period_label, value, period_start")
+  .in("dataset_id", datasetData.map((d) => d.id))
+  .order("period_start", { ascending: true });
+
+if (pointsError) throw pointsError;
+
+// Store all points
+setDataPoints(points || []);
+
+// ✅ Default filtered data for first dataset
+const firstDatasetId = datasetData[0]?.id;
+const defaultFiltered = (points || []).filter(
+  (p) => p.dataset_id === firstDatasetId
+);
+setFiltered(defaultFiltered);
 
         setDataPoints(points || []);
-        setFiltered(points || []);
-
+       
         // 4️⃣ Related graphs
         const { data: related, error: relatedError } = await supabase
           .from("graphs")
@@ -89,45 +110,59 @@ export default function GraphPage() {
     fetchGraph();
   }, [slug]);
 
+
+// 🔁 Update filtered data when dropdown changes
+useEffect(() => {
+  if (!activeDatasetId) return;
+  const newFiltered = dataPoints.filter((d) => d.dataset_id === activeDatasetId);
+  setFiltered(newFiltered);
+}, [activeDatasetId, dataPoints]);
+
+
   // ⚙️ Filter + Calculate stats
-  useEffect(() => {
-    if (!dataPoints.length) return;
+  // ⚙️ Filter + Calculate stats (scoped per dataset)
+useEffect(() => {
+  if (!dataPoints.length || !activeDatasetId) return;
 
-    let filteredData = [...dataPoints];
+  // 🔹 Step 1: filter only current dataset
+  let filteredData = dataPoints.filter((d) => d.dataset_id === activeDatasetId);
 
-    if (periodType === "5") filteredData = dataPoints.slice(-6);
-    else if (periodType === "10") filteredData = dataPoints.slice(-11);
-    else if (periodType === "custom" && startLabel && endLabel) {
-      const startIdx = dataPoints.findIndex((d) => d.period_label === startLabel);
-      const endIdx = dataPoints.findIndex((d) => d.period_label === endLabel);
-      if (startIdx >= 0 
-        
-        
-        && endIdx >= 0)
-        filteredData = dataPoints.slice(startIdx, endIdx + 1);
+  // 🔹 Step 2: apply time filters
+  if (periodType === "5") filteredData = filteredData.slice(-6);
+  else if (periodType === "10") filteredData = filteredData.slice(-11);
+  else if (periodType === "custom" && startLabel && endLabel) {
+    const startIdx = filteredData.findIndex((d) => d.period_label === startLabel);
+    const endIdx = filteredData.findIndex((d) => d.period_label === endLabel);
+    if (startIdx >= 0 && endIdx >= 0) {
+      filteredData = filteredData.slice(startIdx, endIdx + 1);
     }
+  }
 
-    if (latestValue) {
-      filteredData = [
-        ...filteredData,
-        { period_label: "Latest", value: latestValue },
-      ];
-    }
+  // 🔹 Step 3: append latest manual value if entered
+  if (latestValue) {
+    filteredData = [
+      ...filteredData,
+      { period_label: "Latest", value: latestValue, dataset_id: activeDatasetId },
+    ];
+  }
 
-    setFiltered(filteredData);
+  // 🔹 Step 4: update filtered state
+  setFiltered(filteredData);
 
-    if (filteredData.length >= 2) {
-      const start = filteredData[0].value;
-      const end = filteredData[filteredData.length - 1].value;
-      const years = filteredData.length - 1;
+  // 🔹 Step 5: calculate CAGR + Total Return (only for growth datasets)
+  if (filteredData.length >= 2) {
+    const start = filteredData[0].value;
+    const end = filteredData[filteredData.length - 1].value;
+    const years = filteredData.length - 1;
 
-      const cagrVal = ((Math.pow(end / start, 1 / years) - 1) * 100).toFixed(2);
-      const totalVal = (((end - start) / start) * 100).toFixed(2);
+    const cagrVal = ((Math.pow(end / start, 1 / years) - 1) * 100).toFixed(2);
+    const totalVal = (((end - start) / start) * 100).toFixed(2);
 
-      setCagr(`${cagrVal}%`);
-      setTotalReturn(`${totalVal}%`);
-    }
-  }, [periodType, startLabel, endLabel, latestValue, dataPoints]);
+    setCagr(`${cagrVal}%`);
+    setTotalReturn(`${totalVal}%`);
+  }
+}, [activeDatasetId, periodType, startLabel, endLabel, latestValue, dataPoints]);
+ 
 
   // ⏳ Loading state
   if (loading)
@@ -151,8 +186,15 @@ export default function GraphPage() {
       </div>
     );
 
-  const labels = filtered.map((d) => d.period_label);
-  const values = filtered.map((d) => d.value);
+    // 🎯 Determine which dataset is active
+const activeDataset =
+  Array.isArray(dataset) && activeDatasetId
+    ? dataset.find((d) => d.id === activeDatasetId)
+    : dataset[0];
+  // Only use points belonging to the active dataset
+const activeData = dataPoints.filter((p) => p.dataset_id === activeDatasetId);
+const labels = activeData.map((d) => d.period_label);
+const values = activeData.map((d) => d.value);
 
   // ✅ Render (optimized first fold)
   return (
@@ -182,6 +224,58 @@ export default function GraphPage() {
             />
           </section>
 
+{/* Dataset Selector */}
+{Array.isArray(dataset) && dataset.length > 1 && (
+  <div className="flex flex-col items-center justify-center w-full mb-6 sm:mb-8 animate-fadeInUp">
+    <div className="relative flex items-center gap-3 flex-wrap justify-center">
+      <label
+        htmlFor="dataset-select"
+        className="text-sm text-gray-600 font-medium whitespace-nowrap"
+      >
+        Select Dataset:
+      </label>
+
+      {/* Custom dropdown container */}
+      <div className="relative">
+        <select
+          id="dataset-select"
+          className="appearance-none px-4 py-2 rounded-full border border-gray-300 bg-white shadow-sm text-sm text-gray-700 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all 
+                     hover:shadow-md min-w-[260px] text-center pr-8 cursor-pointer"
+          value={activeDatasetId ?? ""}
+          onChange={(e) => setActiveDatasetId(Number(e.target.value))}
+        >
+          {dataset.map((ds) => {
+            const unitText =
+              ds.name.includes(ds.unit) || !ds.unit ? "" : ` (${ds.unit})`;
+            return (
+              <option key={`${ds.id}-${ds.name}`} value={ds.id}>
+                {ds.name}
+                {unitText}
+              </option>
+            );
+          })}
+        </select>
+
+        {/* Custom SVG arrow */}
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="opacity-70"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+)}
           {/* Filters */}
           <section className="mb-4 sm:mb-5 animate-fadeInUp">
             <GraphFilters
@@ -196,79 +290,47 @@ export default function GraphPage() {
             />
           </section>
 
-          {/* Stats */}
-          <section className="mb-4 sm:mb-5 animate-fadeInUp">
-            {(() => {
-              const stats: { label: string; value: string }[] = [];
-              if (dataset.metric_type === "growth") {
-                stats.push(
-                  { label: "CAGR", value: cagr },
-                  { label: "Total Return", value: totalReturn },
-                  { label: "Years", value: `${labels[0]} → ${labels.at(-1)}` }
-                );
-              } else if (dataset.metric_type === "value") {
-                stats.push(
-                  {
-                    label: `Latest Value (${dataset.unit || ""})`,
-                    value: values.at(-1)?.toLocaleString("en-IN") || "--",
-                  },
-                  {
-  label: "Years",
-  value: (() => {
-    // ✅ Build a clean array of all available labels
-    const allLabels = dataPoints.map((d) => d.period_label);
+ {/* Stats (Dynamic from metricBehaviorLogic) */}
+<section className="mb-4 sm:mb-5 animate-fadeInUp">
+  {(() => {
+    if (!activeDataset) return null;
 
-    // ✅ Handle quick ranges first
-    if (periodType === "5") return "Last 5 Years";
-    if (periodType === "10") return "Last 10 Years";
-
-    // ✅ Handle custom or default
-    if (!startLabel || !endLabel) return "Select range";
-
-    const startIndex = allLabels.indexOf(startLabel);
-    const endIndex = allLabels.indexOf(endLabel);
-
-    // ✅ Validate index range
-    if (endIndex < startIndex) return "Invalid range";
-
-    // ✅ Safely return the formatted years
+    const behavior =
+      activeDataset.metric_behavior ||
+      activeDataset.metric_type ||
+      "value";
+    console.log("📊 Active Metric Behavior:", behavior);
+    const unit = activeDataset.unit || "";
     const start = labels[0] || "—";
-    const end = labels[labels.length - 1] || "—";
-    return `${start} → ${end}`;
-  })(),
-}
-                );
-              } else if (dataset.metric_type === "ratio") {
-                const avg =
-                  values.length > 0
-                    ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)
-                    : "--";
-                stats.push(
-                  { label: "Average", value: `${avg}${dataset.unit || "%"}` },
-                  { label: "Years", value: `${labels[0]} → ${labels.at(-1)}` }
-                );
-              } else if (dataset.metric_type === "index") {
-                const change =
-                  values.length >= 2
-                    ? (((values.at(-1)! - values[0]) / values[0]) * 100).toFixed(2)
-                    : "--";
-                stats.push(
-                  { label: "Change", value: `${change}%` },
-                  { label: "Years", value: `${labels[0]} → ${labels.at(-1)}` }
-                );
-              } else {
-                stats.push({
-                  label: "Years",
-                  value: `${labels[0]} → ${labels.at(-1)}`,
-                });
-              }
-              return <GraphStats stats={stats} />;
-            })()}
-          </section>
+    const end = labels.at(-1) || "—";
+    const yearsText = `${start} → ${end}`;
+    const logicFn =
+  metricBehaviorLogic[
+    behavior as keyof typeof metricBehaviorLogic
+  ] || metricBehaviorLogic.value;
 
+  // Recalculate cards every time dataset changes
+const validValues = values.filter((v) => !isNaN(v));
+
+
+    // Generate the stats dynamically
+    const stats = logicFn(values, cagr, totalReturn, yearsText, unit);
+
+    return (
+  <div className="transition-opacity duration-300 ease-in-out" key={activeDatasetId}>
+    <GraphStats stats={stats} />
+  </div>
+);
+  })()}
+</section>
           {/* Chart */}
           <section className="animate-fadeInUp">
-            <GraphChart title={graph.title} labels={labels} values={values} />
+            <GraphChart
+  title={activeDataset?.name || graph.title}
+  labels={filtered.map((d) => d.period_label)}
+  values={filtered.map((d) => d.value)}
+  unit={activeDataset?.unit || ""}
+/>
           </section>
 
           {/* About */}

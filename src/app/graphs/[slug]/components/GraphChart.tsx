@@ -81,10 +81,12 @@ export default function GraphChart({
   title,
   labels,
   values,
+  unit = "",
 }: {
   title: string;
   labels: string[];
   values: number[];
+  unit?: string;
 }) {
   const chartRef = useRef<any>(null);
 
@@ -166,8 +168,13 @@ export default function GraphChart({
         displayColors: false,
         padding: 10,
         callbacks: {
-          label: (context) =>
-            ` ₹${context.parsed.y.toLocaleString("en-IN")}`,
+          label: (context) => {
+          const v = context.parsed.y;
+          const formatted = typeof v === "number"
+            ? v.toLocaleString("en-IN")
+            : `${v}`;
+          return unit ? `${formatted} ${unit}`.trim() : formatted;
+        },
         },
       },
       datalabels: {
@@ -177,9 +184,10 @@ export default function GraphChart({
         font: { weight: 600, size: 11 },
         formatter: (value, ctx) => {
           const label = ctx.chart.data.labels?.[ctx.dataIndex];
-          return label === "Latest"
-            ? `₹${(value as number).toLocaleString("en-IN")}`
-            : "";
+          if (label !== "Latest") return "";
+        const num = value as number;
+        const formatted = num.toLocaleString("en-IN");
+        return unit ? `${formatted} ${unit}` : formatted;
         },
       },
     },

@@ -66,10 +66,14 @@ export default function GraphStats({
               </div>
             ) : (
               <p
-                className={`text-2xl sm:text-3xl font-extrabold mt-1 ${scheme.text}`}
-              >
-                {card.value}
-              </p>
+    className={`${
+      card.value.length > 15
+        ? "text-xl sm:text-2xl"
+        : "text-2xl sm:text-3xl"
+    } font-extrabold mt-1 ${scheme.text}`}
+  >
+    {card.value}
+  </p>
             )}
           </div>
         );
