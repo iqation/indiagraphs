@@ -40,75 +40,86 @@ export default function GraphPage() {
   const [activeDatasetId, setActiveDatasetId] = useState<number | null>(null);
 
   
+  // 🧩 Define dataset + datapoint shape for TypeScript
+type DataPoint = {
+  dataset_id?: number;
+  period_label: string;
+  value: number;
+  period_start?: string;
+  period_end?: string;
+};
 
-  // 🚀 Fetch Graph + Dataset + DataPoints
-  useEffect(() => {
-    async function fetchGraph() {
-      try {
-        // 1️⃣ Graph details
-        const { data: graphData, error: graphError } = await supabase
-          .from("graphs")
-          .select("*")
-          .eq("slug", slug)
-          .single();
-        if (graphError || !graphData) throw graphError;
-        setGraph(graphData);
+type Dataset = {
+  id: number;
+  name: string;
+  color?: string;
+  unit?: string;
+  metric_type?: string;
+  metric_behavior?: string;
+  data_points?: DataPoint[];
+};
 
-        // Fetch all datasets (instead of single)
-const { data: datasetData, error: datasetError } = await supabase
-  .from("datasets")
-  .select("id, name, color, unit, metric_type, metric_behavior")
-  .eq("graph_id", graphData.id);
+// 🚀 Fetch Graph + Dataset + DataPoints (via secure API route)
+useEffect(() => {
+  async function fetchGraph() {
+    try {
+      // ✅ Step 1: Fetch everything via API route
+      if (!slug || typeof slug !== "string") {
+  console.error("❌ Invalid slug provided to fetchGraph:", slug);
+  return;
+}
 
-if (datasetError || !datasetData?.length) throw datasetError;
+const apiUrl = `${window.location.origin}/api/graph/${encodeURIComponent(slug)}`;
+const res = await fetch(apiUrl, { cache: "no-store" });
+      const graphData = await res.json();
 
-// Save all datasets (array)
-setDataset(datasetData);
+      if (!res.ok || !graphData) throw new Error("Failed to fetch graph data");
 
-// Default active dataset (first)
-setActiveDatasetId(datasetData[0]?.id || null);
+      // ✅ Step 2: Core graph details
+      setGraph(graphData);
 
+      // ✅ Step 3: Extract datasets & datapoints
+      const datasets = graphData.datasets || [];
+      setDataset(datasets);
 
+      // Flatten datapoints (attach dataset_id to each)
+      const allPoints = (datasets as Dataset[]).flatMap((ds: Dataset) =>
+  (ds.data_points || []).map((dp: DataPoint) => ({
+          ...dp,
+          dataset_id: ds.id,
+        }))
+      );
+      setDataPoints(allPoints);
 
-        // Fetch data points for all datasets
-const { data: points, error: pointsError } = await supabase
-  .from("data_points")
-  .select("dataset_id, period_label, value, period_start")
-  .in("dataset_id", datasetData.map((d) => d.id))
-  .order("period_start", { ascending: true });
+      // ✅ Step 4: Default active dataset
+      const firstDatasetId = datasets[0]?.id || null;
+      setActiveDatasetId(firstDatasetId);
 
-if (pointsError) throw pointsError;
+      // ✅ Step 5: Default filtered data
+      const defaultFiltered = allPoints.filter(
+        (p) => p.dataset_id === firstDatasetId
+      );
+      setFiltered(defaultFiltered);
 
-// Store all points
-setDataPoints(points || []);
-
-// ✅ Default filtered data for first dataset
-const firstDatasetId = datasetData[0]?.id;
-const defaultFiltered = (points || []).filter(
-  (p) => p.dataset_id === firstDatasetId
-);
-setFiltered(defaultFiltered);
-
-        setDataPoints(points || []);
-       
-        // 4️⃣ Related graphs
-        const { data: related, error: relatedError } = await supabase
-          .from("graphs")
-          .select("title, slug")
-          .eq("category", graphData.category)
-          .neq("slug", slug)
-          .limit(4);
-        if (!relatedError) setRelatedGraphs(related || []);
-
-        setLoading(false);
-      } catch (err) {
-        console.error("❌ Error fetching data:", err);
-        setLoading(false);
+      // ✅ Step 6: Related graphs (optional if API includes them)
+      if (graphData.related_graphs) {
+        setRelatedGraphs(graphData.related_graphs);
+      } else {
+        // fallback for now
+        const relRes = await fetch(`/api/related-graphs?category=${graphData.category}&slug=${slug}`);
+        const related = await relRes.json();
+        setRelatedGraphs(related || []);
       }
-    }
 
-    fetchGraph();
-  }, [slug]);
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ Error fetching graph:", err);
+      setLoading(false);
+    }
+  }
+
+  if (slug) fetchGraph();
+}, [slug]);
 
 
 // 🔁 Update filtered data when dropdown changes
@@ -287,6 +298,9 @@ const values = activeData.map((d) => d.value);
               setLatestValue={setLatestValue}
               setPeriodType={setPeriodType}
               periodType={periodType}
+               metricBehavior={activeDataset?.metric_behavior} // ✅ add this
+              allowLatestValue={activeDataset?.metric_behavior === "value" || activeDataset?.metric_behavior === "growth"}
+  unit={activeDataset?.unit}
             />
           </section>
 
@@ -335,15 +349,11 @@ const validValues = values.filter((v) => !isNaN(v));
 
           {/* About */}
           <GraphAbout
-            description={graph.description}
-            source={graph.source}
-            formula={"CAGR = [(Ending Value / Starting Value) ^ (1 / Years)] - 1"}
-            interactionSteps={[
-              "Select time range (5Y / 10Y / Custom)",
-              "Adjust start and end FY to explore different trends",
-              "Optionally enter custom latest price to recalculate CAGR",
-            ]}
-          />
+  description={graph.description}
+  source={graph.source}
+  metricBehavior={activeDataset?.metric_behavior}
+  category={graph.category}
+/>
 
           {/* Related */}
           <RelatedGraphs related={relatedGraphs} />

@@ -1,4 +1,5 @@
 import { supabase } from "../../lib/supabaseClient";
+import { supabaseServer } from "../../lib/supabaseServer";
 import GraphPage from "./GraphPage";
 // ✅ Required for Next.js 15+
 
@@ -7,7 +8,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const { slug } = await props.params; // ✅ await required
 
   // 🧭 Fetch graph details for SEO metadata
-  const { data: graph } = await supabase
+  const { data: graph } = await supabaseServer
     .from("graphs")
     .select("title, description, source, category")
     .eq("slug", slug)

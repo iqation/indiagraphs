@@ -15,25 +15,22 @@ export default function GraphsHome() {
 
   // 🚀 Fetch graphs
   useEffect(() => {
-    async function fetchGraphs() {
-      try {
-        const { data, error } = await supabase
-          .from("graphs")
-          .select("title, slug, category, description, source")
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-        setGraphs(data || []);
-        setFiltered(data || []);
-      } catch (err) {
-        console.error("Error fetching graphs:", err);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchGraphs() {
+    try {
+      const res = await fetch("/api/graphs", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch graphs");
+      const data = await res.json();
+      setGraphs(data || []);
+      setFiltered(data || []);
+    } catch (err) {
+      console.error("Error fetching graphs:", err);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchGraphs();
-  }, []);
+  fetchGraphs();
+}, []);
 
   // 🔍 Handle search
   useEffect(() => {

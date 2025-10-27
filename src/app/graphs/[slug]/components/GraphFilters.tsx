@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, ArrowRight, Sparkles } from "lucide-react";
+import { Calendar, ArrowRight } from "lucide-react";
 
 type Props = {
   allLabels: string[];
@@ -12,6 +12,9 @@ type Props = {
   setLatestValue: (v: number | null) => void;
   setPeriodType: (v: string) => void;
   periodType: string;
+  unit?: string;
+  metricBehavior?: string; // ✅ NEW — passed from dataset
+  allowLatestValue?: boolean; // ✅ Add this
 };
 
 export default function GraphFilters({
@@ -23,42 +26,47 @@ export default function GraphFilters({
   setLatestValue,
   setPeriodType,
   periodType,
+  unit,
+  metricBehavior,
 }: Props) {
   const [priceInput, setPriceInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPriceInput(value);
-    setLatestValue(value ? parseFloat(value) : null);
-  };
-
   // 🧠 Validation: Ensure end FY ≥ start FY
-  // 🧠 Validation: Ensure end FY ≥ start FY
-useEffect(() => {
-  if (periodType !== "custom") {
-    setErrorMessage(""); // clear error when not custom
-    return;
-  }
+  useEffect(() => {
+    if (periodType !== "custom") {
+      setErrorMessage("");
+      return;
+    }
 
-  if (startLabel && endLabel) {
-    const startIndex = allLabels.indexOf(startLabel);
-    const endIndex = allLabels.indexOf(endLabel);
+    if (startLabel && endLabel) {
+      const startIndex = allLabels.indexOf(startLabel);
+      const endIndex = allLabels.indexOf(endLabel);
 
-    if (endIndex < startIndex) {
-      setErrorMessage("End year cannot be earlier than start year.");
+      if (endIndex < startIndex) {
+        setErrorMessage("End year cannot be earlier than start year.");
+      } else {
+        setErrorMessage("");
+      }
     } else {
       setErrorMessage("");
     }
-  } else {
-    setErrorMessage("");
-  }
-}, [startLabel, endLabel, allLabels, periodType]);
+  }, [startLabel, endLabel, allLabels, periodType]);
+
+  // 📌 Smart placeholder logic
+  const isGrowthType =
+    metricBehavior === "growth" ||
+    metricBehavior === "value" ||
+    metricBehavior === "price";
+  const placeholder = isGrowthType
+    ? `Enter latest price ${unit ? `(${unit})` : ""}`
+    : `Enter latest value ${unit ? `(${unit})` : ""}`;
 
   return (
     <div className="flex flex-col items-center gap-3 sm:gap-4 mt-2">
       {/* 🧭 Period Selection */}
       <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
+        {/* Period Type Selector */}
         <div className="relative">
           <select
             value={periodType}
@@ -72,7 +80,6 @@ useEffect(() => {
             <option value="10">10 Years</option>
             <option value="custom">Custom</option>
           </select>
-         
         </div>
 
         {/* Show Custom Inputs only for "Custom" */}
@@ -88,16 +95,15 @@ useEffect(() => {
                            shadow-sm hover:shadow-md focus:ring-2 focus:ring-indigo-300 
                            transition-all cursor-pointer"
               >
-               {/* ✅ START YEAR DROPDOWN */}
-<option value="">Start FY</option>
-{[...new Set(allLabels)]
-  .filter((label) => label && label.trim() !== "")
-  .sort()
-  .map((label, index) => (
-    <option key={`${label}-${index}-${Math.random()}`} value={label}>
-      {label}
-    </option>
-  ))}
+                <option value="">Start FY</option>
+                {[...new Set(allLabels)]
+                  .filter((label) => label && label.trim() !== "")
+                  .sort()
+                  .map((label, index) => (
+                    <option key={`${label}-${index}`} value={label}>
+                      {label}
+                    </option>
+                  ))}
               </select>
               <Calendar
                 size={16}
@@ -119,16 +125,15 @@ useEffect(() => {
                                : "border-gray-200"
                            }`}
               >
-                {/* ✅ END YEAR DROPDOWN */}
-<option value="">End FY</option>
-{[...new Set(allLabels)]
-  .filter((label) => label && label.trim() !== "")
-  .sort()
-  .map((label, index) => (
-    <option key={`${label}-${index}-${Math.random()}`} value={label}>
-      {label}
-    </option>
-  ))}
+                <option value="">End FY</option>
+                {[...new Set(allLabels)]
+                  .filter((label) => label && label.trim() !== "")
+                  .sort()
+                  .map((label, index) => (
+                    <option key={`${label}-${index}`} value={label}>
+                      {label}
+                    </option>
+                  ))}
               </select>
               <ArrowRight
                 size={16}
@@ -138,42 +143,34 @@ useEffect(() => {
               />
             </div>
 
-            {/* Latest Price */}
-           <input
-  type="text"
-  inputMode="decimal"
-  pattern="^[0-9]*\\.?[0-9]*$"
-  value={priceInput}
-  onChange={(e) => {
-    const value = e.target.value;
+            {/* ✅ Unified Latest Input */}
+            <input
+              id="latest-value"
+              type="text"
+              inputMode="decimal"
+              pattern="^[0-9]*\\.?[0-9]*$"
+              value={priceInput}
+              onChange={(e) => {
+                const value = e.target.value;
 
-    // ✅ Block invalid characters (non-numeric or negative)
-    if (/[^0-9.]/.test(value)) return;
+                if (/[^0-9.]/.test(value)) return;
+                if ((value.match(/\./g) || []).length > 1) return;
 
-    // ✅ Prevent multiple decimals
-    if ((value.match(/\./g) || []).length > 1) return;
-
-    // ✅ Update valid value
-    setPriceInput(value);
-    setLatestValue(value ? Math.max(parseFloat(value), 0) : null);
-  }}
-  onBlur={() => {
-    // ✅ Clean trailing decimal on blur
-    if (priceInput.endsWith(".")) {
-      const fixed = priceInput.slice(0, -1);
-      setPriceInput(fixed);
-      setLatestValue(fixed ? parseFloat(fixed) : null);
-    }
-  }}
-  placeholder="Latest Price (₹)"
-  className={`px-5 py-2.5 rounded-full bg-white/80 border text-gray-700 text-sm font-medium w-44 text-center
-              shadow-sm hover:shadow-md focus:ring-2 transition-all placeholder-gray-400
-              ${
-                priceInput && parseFloat(priceInput) < 0
-                  ? "border-red-400 focus:ring-red-300"
-                  : "border-gray-200 focus:ring-indigo-300"
-              }`}
-/>
+                setPriceInput(value);
+                setLatestValue(value ? Math.max(parseFloat(value), 0) : null);
+              }}
+              onBlur={() => {
+                if (priceInput.endsWith(".")) {
+                  const fixed = priceInput.slice(0, -1);
+                  setPriceInput(fixed);
+                  setLatestValue(fixed ? parseFloat(fixed) : null);
+                }
+              }}
+              placeholder={placeholder}
+              className="px-5 py-2.5 rounded-full bg-white/80 border text-gray-700 text-sm font-medium w-48 text-center
+                         shadow-sm hover:shadow-md focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 
+                         transition-all placeholder-gray-400 border-gray-200"
+            />
           </>
         )}
       </div>

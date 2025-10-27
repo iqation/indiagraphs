@@ -1,5 +1,6 @@
 // src/app/api/layout/route.ts
 import { NextResponse } from "next/server";
+import { supabaseServer } from "../../lib/supabaseServer"; 
 
 // ✅ API route to fetch the WordPress header & footer layout
 export async function GET() {
