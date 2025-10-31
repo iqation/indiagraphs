@@ -26,7 +26,7 @@ export const metricBehaviorLogic = {
         ? (((values.at(-1)! - values[0]) / values[0]) * 100).toFixed(1)
         : "--";
     return [
-      { label: "Latest", value: `${latest} ${unit}` },
+      { label: "Latest FY Index", value: `${latest} ${unit}` },
       { label: "Change Since Base", value: `${change}%` },
       { label: "Years", value: yearsText },
     ];
@@ -53,6 +53,38 @@ export const metricBehaviorLogic = {
     return [
       { label: "Max", value: `${max}${unit}` },
       { label: "Min", value: `${min}${unit}` },
+      { label: "Years", value: yearsText },
+    ];
+  },
+
+  // 💱 Forex data (USD-INR, Euro-INR, etc.)
+  forex: (values, cagr, totalReturn, yearsText, unit) => {
+    const valid = values.filter((v) => !isNaN(v));
+    const latest = valid.at(-1)?.toFixed(2) ?? "--";
+    const yoyChange =
+      valid.length >= 2
+        ? (((valid.at(-1)! - valid.at(-2)!) / valid.at(-2)!) * 100).toFixed(2)
+        : "--";
+    return [
+      { label: "Latest FY Rate", value: `${latest} ${unit}` },
+      { label: "YoY Change", value: `${yoyChange}%` },
+      { label: "Years", value: yearsText },
+    ];
+  },
+
+  // 🌾 Trade & Export metrics (spices, imports, exports, etc.)
+  trade: (values, cagr, totalReturn, yearsText, unit) => {
+    const valid = values.filter((v) => !isNaN(v));
+    const max = valid.length
+      ? Math.max(...valid).toLocaleString("en-IN")
+      : "--";
+    const growth =
+      valid.length >= 2
+        ? (((valid.at(-1)! - valid[0]) / valid[0]) * 100).toFixed(1)
+        : "--";
+    return [
+      { label: "Max", value: `${max} ${unit}` },
+      { label: "Growth Since Start", value: `${growth}%` },
       { label: "Years", value: yearsText },
     ];
   },

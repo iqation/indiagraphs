@@ -18,7 +18,7 @@ export default function IGFooter() {
         </div>
 
         <p className="text-xs text-gray-500">
-          © {new Date().getFullYear()} Indiagraphs.com — India’s Data Storytelling Platform
+          © {new Date().getFullYear()} Indiagraphs.com - India’s Data Storytelling Platform
         </p>
       </div>
     </footer>

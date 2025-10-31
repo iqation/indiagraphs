@@ -67,6 +67,30 @@ export default function GraphAbout({
       ];
       break;
 
+          // 🌾 Trade / Export Metrics (Spices, Agri, Commodity Exports)
+    case "trade":
+      formula = "Growth Since Start = [(Latest Value − Starting Value) / Starting Value] × 100";
+      explanation =
+        "Shows how India's trade have evolved over time — measured in both quantity and value , based on official data.";
+      exploreSteps = [
+        "Switch between trade value and quantity using the dataset selector.",
+        "Select custom start and end years to see trade growth over time.",
+        "Compare performance across major commodities like turmeric, cumin, and pepper.",
+      ];
+      break;
+
+          // 💱 Forex Metrics (USD-INR, EUR-INR, etc.)
+    case "forex":
+      formula = "Exchange Rate = ₹ per unit of foreign currency";
+      explanation =
+        "Shows how the Indian Rupee’s exchange rate has moved against key global currencies like the US Dollar, Euro, Pound, and Yen over time.";
+      exploreSteps = [
+        "Use the dropdown to switch between average and end-year rates.",
+        "Observe how global or domestic events impacted the Rupee’s value.",
+        "Identify long-term depreciation or appreciation trends.",
+      ];
+      break;
+
     // 🧾 Fallback for Others
     default:
       formula = "Value = As reported by official data source.";
