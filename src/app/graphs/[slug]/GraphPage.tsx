@@ -15,6 +15,7 @@ import GraphChart from "./components/GraphChart";
 import GraphAbout from "./components/GraphAbout";
 import RelatedGraphs from "./components/RelatedGraphs";
 import { metricBehaviorLogic } from "../../config/metricBehaviorLogic";
+import AskThisGraph from "./components/AskThisGraph";
 //import IGHeader from "@/app/components/IGHeader";
 
 export default function GraphPage() {
@@ -346,6 +347,10 @@ const validValues = values.filter((v) => !isNaN(v));
   unit={activeDataset?.unit || ""}
 />
           </section>
+
+          {/* Auto Insight */}
+<AskThisGraph graphData={graph} />
+
 
           {/* About */}
           <GraphAbout
