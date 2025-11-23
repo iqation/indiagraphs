@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 // --------------------------------------
-// ✅ Allowed WP page slugs
+// Allowed WP page slugs
 // --------------------------------------
 const ALLOWED_WP_PAGES = [
   "about",
@@ -17,7 +17,7 @@ const ALLOWED_WP_PAGES = [
 ];
 
 // --------------------------------------
-// ✅ Fetch WordPress page by slug
+// Fetch WordPress page by slug
 // --------------------------------------
 async function fetchWPPageBySlug(slug: string) {
   try {
@@ -25,7 +25,6 @@ async function fetchWPPageBySlug(slug: string) {
       `https://cms.indiagraphs.com/wp-json/wp/v2/pages?slug=${slug}`,
       { cache: "no-store" }
     );
-
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -38,15 +37,19 @@ async function fetchWPPageBySlug(slug: string) {
 // --------------------------------------
 // PAGE COMPONENT
 // --------------------------------------
-export default async function WPPage({ params }: { params: { slug: string } }) {
+export default async function WPPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const slug = params.slug;
 
-  // ❌ If slug is not in our whitelist → return 404
+  // Validate slug
   if (!ALLOWED_WP_PAGES.includes(slug)) {
     return notFound();
   }
 
-  // Fetch the WP page
+  // Fetch WP page
   const page = await fetchWPPageBySlug(slug);
   if (!page) return notFound();
 
@@ -70,9 +73,7 @@ export default async function WPPage({ params }: { params: { slug: string } }) {
             prose-p:text-[1.1rem] prose-p:leading-7
             prose-li:text-[1.1rem] prose-li:leading-7
           "
-          dangerouslySetInnerHTML={{
-            __html: content,
-          }}
+          dangerouslySetInnerHTML={{ __html: content }}
         />
       </main>
 
