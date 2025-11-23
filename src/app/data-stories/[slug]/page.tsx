@@ -154,11 +154,7 @@ function extractFaqFromRankMath(head: string) {
 // ---------------------------
 // Dynamic SEO Metadata (Rank Math)
 // ---------------------------
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
   // Some Next versions supply params as a promise-like object; normalize by awaiting.
   const { slug } = (await params) as { slug: string };
   const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
@@ -211,11 +207,7 @@ export async function generateMetadata({
 // ---------------------------
 // Page Component
 // ---------------------------
-export default async function StoryPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function StoryPage({ params }: { params: any }) {
   const { slug } = (await params) as { slug: string };
 
   const story = await fetchStory(slug);

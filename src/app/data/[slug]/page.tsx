@@ -1,8 +1,8 @@
 import { supabaseServer } from "../../lib/supabaseServer";
 import DataPage from "./DataPage";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: any }) {
+  const { slug } = (await params) as { slug: string };
 
   // Fetch minimal SEO-required fields
   const { data: graph } = await supabaseServer
@@ -104,6 +104,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  return <DataPage  slug={params.slug} />;
+export default async function Page({ params }: { params: any }) {
+  const { slug } = (await params) as { slug: string };
+  return <DataPage slug={slug} />;
 }

@@ -32,12 +32,8 @@ async function fetchWPPageBySlug(slug: string) {
 }
 
 // ⭐ FIXED — NEXT.JS 15 COMPATIBLE
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const slug = params.slug;
+export async function generateMetadata({ params }: { params: any }) {
+  const { slug } = (await params) as { slug: string };
 
   if (!ALLOWED_WP_PAGES.includes(slug)) return {};
 
@@ -54,12 +50,8 @@ export async function generateMetadata({
 }
 
 // ⭐ FIXED — PAGE COMPONENT
-export default async function WPPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const slug = params.slug;
+export default async function WPPage({ params }: { params: any }) {
+  const { slug } = (await params) as { slug: string };
 
   if (!ALLOWED_WP_PAGES.includes(slug)) {
     return notFound();
