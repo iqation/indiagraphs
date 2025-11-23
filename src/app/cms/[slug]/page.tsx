@@ -6,9 +6,7 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-// --------------------------------------
-// Allowed WP page slugs
-// --------------------------------------
+// Allowed WP slugs
 const ALLOWED_WP_PAGES = [
   "about",
   "privacy-policy",
@@ -16,15 +14,14 @@ const ALLOWED_WP_PAGES = [
   "disclaimer",
 ];
 
-// --------------------------------------
-// Fetch WordPress page by slug
-// --------------------------------------
+// Fetch WP page
 async function fetchWPPageBySlug(slug: string) {
   try {
     const res = await fetch(
       `https://cms.indiagraphs.com/wp-json/wp/v2/pages?slug=${slug}`,
       { cache: "no-store" }
     );
+
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -34,9 +31,29 @@ async function fetchWPPageBySlug(slug: string) {
   }
 }
 
-// --------------------------------------
-// PAGE COMPONENT
-// --------------------------------------
+// ⭐ FIXED — NEXT.JS 15 COMPATIBLE
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const slug = params.slug;
+
+  if (!ALLOWED_WP_PAGES.includes(slug)) return {};
+
+  const page = await fetchWPPageBySlug(slug);
+  if (!page) return {};
+
+  return {
+    title: he.decode(page.title.rendered),
+    description:
+      he.decode(
+        page.excerpt?.rendered?.replace(/<[^>]*>?/gm, "") || ""
+      ) || "",
+  };
+}
+
+// ⭐ FIXED — PAGE COMPONENT
 export default async function WPPage({
   params,
 }: {
@@ -44,12 +61,10 @@ export default async function WPPage({
 }) {
   const slug = params.slug;
 
-  // Validate slug
   if (!ALLOWED_WP_PAGES.includes(slug)) {
     return notFound();
   }
 
-  // Fetch WP page
   const page = await fetchWPPageBySlug(slug);
   if (!page) return notFound();
 
@@ -66,13 +81,7 @@ export default async function WPPage({
         </h1>
 
         <article
-          className="
-            prose prose-indigo max-w-none
-            prose-h2:text-2xl prose-h2:font-bold
-            prose-h3:text-xl prose-h3:font-semibold
-            prose-p:text-[1.1rem] prose-p:leading-7
-            prose-li:text-[1.1rem] prose-li:leading-7
-          "
+          className="prose prose-indigo max-w-none"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </main>
