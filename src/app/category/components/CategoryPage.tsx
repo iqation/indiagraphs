@@ -130,7 +130,7 @@ export default function CategoryPage({ slug }: { slug: string }) {
               {graphs.map((g) => (
                 <Link
                   key={g.slug}
-                  href={`/graphs/${g.slug}`}
+                  href={`/data/${g.slug}`}
                   className="group bg-white/80 backdrop-blur-lg p-6 rounded-2xl border border-gray-200 shadow-[0_4px_14px_rgba(0,0,0,0.08)] 
                              hover:shadow-[0_6px_20px_rgba(79,70,229,0.25)] hover:scale-[1.015] transition-all duration-300"
                 >

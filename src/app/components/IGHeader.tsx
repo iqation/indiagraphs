@@ -1,173 +1,231 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 
-type MenuItem = { label: string; url: string; children?: MenuItem[] };
-
-function decodeHTMLEntities(str: string) {
-  if (!str) return str;
-  const el = document.createElement("textarea");
-  el.innerHTML = str;
-  return el.value;
-}
-function decodeMenu(items: MenuItem[]): MenuItem[] {
-  return items.map(i => ({
-    label: decodeHTMLEntities(i.label),
-    url: i.url,
-    children: i.children ? decodeMenu(i.children) : undefined,
-  }));
-}
-
 export default function IGHeader() {
-  const [menu, setMenu] = useState<MenuItem[]>([]);
-  const [contactUrl, setContactUrl] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  // Load menu
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem("ig_menu");
-      if (cached) {
-        const data = JSON.parse(cached);
-        setMenu(decodeMenu(data.menu || []));
-        setContactUrl(data.contactUrl || "");
-      }
-    } catch {}
-
-    fetch("https://indiagraphs.com/wp-json/indiagraphs/v1/navigation")
-      .then(r => r.json())
-      .then(data => {
-        setMenu(decodeMenu(data.menu || []));
-        setContactUrl(data.contactUrl || "");
-        localStorage.setItem("ig_menu", JSON.stringify(data));
-      })
-      .catch(() => {});
-  }, []);
-
-  // Close mobile menu when navigating
-  const handleNavigate = () => setMobileOpen(false);
+  const toggleMobile = () => setMobileOpen((p) => !p);
+  const toggleDropdown = (key: string) => {
+    setOpenDropdown(openDropdown === key ? null : key);
+  };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[100] bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 py-3">
+    <header className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-lg border-b border-gray-100 shadow-sm z-[100]">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
+        
         {/* Logo */}
-        <Link
-  href="https://indiagraphs.com"
-  className="flex items-center gap-2 focus:outline-none focus:ring-0"
-  onClick={handleNavigate}
->
-  <img
-    src="/logo.webp"
-    alt="Indiagraphs Logo"
-    className="h-8 w-auto object-contain"
-    style={{
-      filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.08))",
-    }}
-  />
-</Link>
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/logo.webp" alt="Indiagraphs Logo" className="h-8 w-auto" />
+        </Link>
 
-        {/* --- Desktop Nav --- */}
-        <nav className="hidden md:flex items-center gap-6 relative">
-          {menu.map((item, idx) => (
-            <div key={idx} className="group relative">
-              <Link
-                href={item.url}
-                className="text-gray-700 font-medium hover:text-indigo-600 transition-colors flex items-center gap-1"
-              >
-                {item.label}
-                {!!item.children?.length && (
-                  <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-500" />
-                )}
+        {/* ===================== DESKTOP NAV ===================== */}
+        <nav className="hidden md:flex items-center gap-8 font-medium text-slate-700">
+          
+          {/* Data */}
+          <div className="relative group">
+            <button className="flex items-center gap-1 hover:text-indigo-600">
+              Data <ChevronDown size={14} className="opacity-60" />
+            </button>
+
+            <div className="absolute left-0 top-full hidden group-hover:block bg-white border rounded-lg shadow-lg py-3 w-56">
+              <Link href="/#all-graphs" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                All Datasets
+              </Link>
+              <Link href="/category/economy" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Economy & Macro
+              </Link>
+              <Link href="/category/banking" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Banking & Credit
+              </Link>
+              <Link href="/category/digital-payments" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Digital Payments
+              </Link>
+              <Link href="/category/commodities" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Commodities
+              </Link>
+              <Link href="/category/trade" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Trade & Exports
+              </Link>
+              <Link href="/category/small-savings" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Small Savings
+              </Link>
+              <Link href="/category/forex" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Foreign Exchange
+              </Link>
+              <Link href="/category/social" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Social & Demographics
+              </Link>
+            </div>
+          </div>
+
+          {/* ❌ TOOLS — Removed Completely */}
+
+          {/* Data Stories */}
+          <Link href="/data-stories" className="hover:text-indigo-600">
+            Data Stories
+          </Link>
+
+          {/* Solutions */}
+          <div className="relative group">
+            <button className="flex items-center gap-1 hover:text-indigo-600">
+              Solutions <ChevronDown size={14} className="opacity-60" />
+            </button>
+
+            <div className="absolute left-0 top-full hidden group-hover:block bg-white border rounded-lg shadow-lg w-56 py-3">
+
+              {/* API Access */}
+              <Link href="#" className="block px-4 py-2 text-sm text-gray-500 cursor-not-allowed">
+                API Access (Coming Soon)
               </Link>
 
-              {!!item.children?.length && (
-                <div className="absolute left-0 mt-2 hidden group-hover:block bg-white/95 backdrop-blur-lg border border-gray-100 rounded-lg shadow-lg py-2 min-w-[220px] z-[9999]">
-                  {item.children.map((sub, sidx) => (
+              {/* Enterprise Data Delivery — now disabled */}
+              <Link
+                href="#"
+                className="block px-4 py-2 text-sm text-gray-500 cursor-not-allowed"
+              >
+                Enterprise Data Delivery (Coming Soon)
+              </Link>
+            </div>
+          </div>
+
+          {/* About */}
+          <div className="relative group">
+            <button className="flex items-center gap-1 hover:text-indigo-600">
+              About <ChevronDown size={14} className="opacity-60" />
+            </button>
+
+            <div className="absolute left-0 top-full hidden group-hover:block bg-white border rounded-lg shadow-lg w-48 py-3">
+              <Link href="/about" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                About Us
+              </Link>
+              <Link href="/contact" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Contact
+              </Link>
+            </div>
+          </div>
+
+          {/* Policy */}
+          <div className="relative group">
+            <button className="flex items-center gap-1 hover:text-indigo-600">
+              Policy <ChevronDown size={14} className="opacity-60" />
+            </button>
+
+            <div className="absolute left-0 top-full hidden group-hover:block bg-white border rounded-lg shadow-lg w-56 py-3">
+              <Link href="/disclaimer" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Disclaimer
+              </Link>
+              <Link href="/privacy" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+                Terms & Conditions
+              </Link>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <Link
+            href="/contact"
+            className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition"
+          >
+            Contact Sales
+          </Link>
+        </nav>
+
+        {/* ========== MOBILE MENU ICON ========== */}
+        <button className="md:hidden p-2" onClick={toggleMobile}>
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
+
+      {/* ===================== MOBILE MENU ===================== */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-t shadow-lg px-5 py-4 space-y-3 text-slate-700">
+
+          {/* MOBILE DROPDOWN LISTS */}
+          {[
+            {
+              key: "data",
+              label: "Data",
+              items: [
+                ["All Datasets", "/#all-graphs"],
+                ["Economy & Macro", "/category/economy"],
+                ["Banking & Credit", "/category/banking"],
+                ["Digital Payments", "/category/digital-payments"],
+                ["Commodities", "/category/commodities"],
+                ["Trade & Exports", "/category/trade"],
+                ["Small Savings", "/category/small-savings"],
+                ["Foreign Exchange", "/category/forex"],
+                ["Social & Demographics", "/category/social"],
+              ],
+            },
+            {
+              key: "solutions",
+              label: "Solutions",
+              items: [
+                ["API Access (Coming Soon)", "#"],
+                ["Enterprise Data Delivery (Coming Soon)", "#"],
+              ],
+            },
+            {
+              key: "about",
+              label: "About",
+              items: [
+                ["About Us", "/about"],
+                ["Contact", "/contact"],
+              ],
+            },
+            {
+              key: "policy",
+              label: "Policy",
+              items: [
+                ["Disclaimer", "/disclaimer"],
+                ["Privacy Policy", "/privacy"],
+                ["Terms & Conditions", "/terms"],
+              ],
+            },
+          ].map((section) => (
+            <div key={section.key}>
+              <button
+                onClick={() => toggleDropdown(section.key)}
+                className="flex justify-between w-full py-2 font-medium"
+              >
+                {section.label}
+                <ChevronDown
+                  size={18}
+                  className={`transition ${
+                    openDropdown === section.key ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {openDropdown === section.key && (
+                <div className="ml-3 mt-1 space-y-1 border-l border-gray-300 pl-3">
+                  {section.items.map(([label, url]) => (
                     <Link
-                      key={sidx}
-                      href={sub.url}
-                      className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-sm"
+                      key={label}
+                      href={url}
+                      className="block py-1 text-sm hover:text-indigo-600"
                     >
-                      {sub.label}
+                      {label}
                     </Link>
                   ))}
                 </div>
               )}
             </div>
           ))}
-        </nav>
 
-        {/* Contact (Desktop) */}
-        {!!contactUrl && (
-          <a
-            href={contactUrl}
-            className="hidden md:inline-block bg-[#17153B] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors"
+          {/* CTA */}
+          <Link
+            href="/contact"
+            className="block w-full text-center bg-indigo-600 text-white rounded-full py-2 font-semibold mt-4"
           >
-            Contact
-          </a>
-        )}
-
-        {/* --- Mobile Menu Button --- */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-
-      {/* --- Mobile Drawer --- */}
-      {mobileOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-md animate-fadeIn">
-          <nav className="flex flex-col py-4 px-5 space-y-2">
-            {menu.map((item, idx) => (
-              <div key={idx}>
-                <button
-                  onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
-                  className="w-full flex justify-between items-center text-gray-700 font-medium text-base py-2 hover:text-indigo-600"
-                >
-                  {item.label}
-                  {!!item.children?.length && (
-                    <ChevronDown
-                      size={16}
-                      className={`transition-transform duration-200 ${
-                        openDropdown === idx ? "rotate-180 text-indigo-600" : "text-gray-400"
-                      }`}
-                    />
-                  )}
-                </button>
-
-                {/* Submenu */}
-                {openDropdown === idx && item.children?.length && (
-                  <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 animate-fadeIn">
-                    {item.children.map((sub, sidx) => (
-                      <Link
-                        key={sidx}
-                        href={sub.url}
-                        onClick={handleNavigate}
-                        className="block text-sm text-gray-600 py-1 hover:text-indigo-600"
-                      >
-                        {sub.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {!!contactUrl && (
-              <a
-                href={contactUrl}
-                className="block mt-4 bg-[#17153B] text-white text-center text-sm font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors"
-              >
-                Contact
-              </a>
-            )}
-          </nav>
+            Contact Sales
+          </Link>
         </div>
       )}
     </header>

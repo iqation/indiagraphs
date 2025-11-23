@@ -1,22 +1,24 @@
+// src/app/data/page.tsx
 import type { Metadata } from "next";
-import GraphsHome from "./GraphsHome";
+import { supabaseServer } from "./lib/supabaseServer";
+import DataHome from "./DataHome";
 
 export const metadata: Metadata = {
-  title: "Explore India's Data Through Interactive Graphs",
+  title: "India's Data Stories, Interactive Graphs & Insights | Indiagraphs",
   description:
-    "Dive into India's economy, markets, and society with interactive, data-driven charts powered by trusted public sources.",
+    "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
   openGraph: {
-    title: "Interactive Graphs on India's Economy & Markets | Indiagraphs",
+    title: "Indiagraphs - India's Data Stories, Charts & Interactive Visual Insights",
     description:
-      "Visualize India's key indicators — GDP, gold prices, taxes, inflation, and more — through dynamic, interactive charts.",
-    url: "https://indiagraphs.com/graphs",
+      "Discover data-driven insights on India with interactive graphs, visual stories, and reliable indicators sourced from RBI, MOSPI, NSO, and more.",
+    url: "https://indiagraphs.com",
     siteName: "Indiagraphs",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Indiagraphs – Interactive Data Visualizations",
+        alt: "Indiagraphs - India's Data Stories & Interactive Visualizations",
       },
     ],
     locale: "en_IN",
@@ -24,15 +26,20 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Indiagraphs – Interactive Data Insights on India",
+    title: "Indiagraphs - India's Data Stories & Interactive Graphs",
     description:
-      "Explore India's growth story through interactive graphs and data visualizations from credible sources.",
+      "Visualize India's key indicators through interactive charts and data stories backed by official, credible Indian data.",
     images: ["/og-image.jpg"],
   },
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://indiagraphs.com/graphs" },
+  alternates: { canonical: "https://indiagraphs.com" },
 };
 
-export default function GraphsPage() {
-  return <GraphsHome />;
+export default async function DataPage() {
+  const { data: graphs } = await supabaseServer
+    .from("graphs")
+    .select("title, slug, description, category, source")
+    .order("title", { ascending: true });
+
+  return <DataHome graphs={graphs ?? []} />;
 }

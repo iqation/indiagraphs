@@ -16,7 +16,7 @@ export default function RelatedGraphs({ related }: RelatedGraphsProps) {
         {related.map((g) => (
           <Link
             key={g.slug}
-            href={`/graphs/${g.slug}`}
+            href={`/data/${g.slug}`}
             className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg border border-indigo-100 text-sm font-medium transition"
           >
             {g.title}

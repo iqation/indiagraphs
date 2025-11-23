@@ -111,10 +111,182 @@ main {
   z-index: 0;
   position: relative;
 }
-main {
+/* main {
   background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
-}
+} */
 
 footer {
   background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
+}
+
+
+/* ---------------------------------------------
+   DATA STORIES — TABLE WITH COLUMN LINES
+---------------------------------------------- */
+
+.data-story-body table {
+  @apply w-full border-collapse text-sm my-10 rounded-xl overflow-hidden shadow-sm;
+  table-layout: fixed;
+  border: 1px solid #e2e8f0; /* outer border */
+}
+
+/* Header */
+.data-story-body thead tr {
+  @apply bg-slate-100;
+}
+
+.data-story-body thead th {
+  @apply px-4 py-3 font-semibold text-slate-700 border-b border-slate-300 text-left;
+  border-right: 1px solid #e5e7eb; /* column lines */
+}
+
+.data-story-body thead th:last-child {
+  border-right: none;
+}
+
+/* Table layout */
+.data-story-body table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto; /* allows natural sizing */
+}
+
+/* Keep header readable */
+.data-story-body thead th {
+  @apply px-4 py-3 font-semibold text-slate-700 border-b border-slate-300 bg-slate-100;
+  border-right: 1px solid #e5e7eb;
+  white-space: nowrap; /* Prevent header overlap */
+}
+
+/* Allow body text to wrap if needed */
+.data-story-body tbody td {
+  @apply px-4 py-3 border-b border-slate-200 font-medium;
+  border-right: 1px solid #e5e7eb;
+  white-space: nowrap; /* Prevent weird breaks */
+}
+
+/* Remove last border */
+.data-story-body thead th:last-child,
+.data-story-body tbody td:last-child {
+  border-right: none;
+}
+
+/* Row striping */
+.data-story-body tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+/* Hover */
+.data-story-body tbody tr:hover {
+  background: #eef2ff;
+}
+
+/* Body rows */
+.data-story-body tbody tr:nth-child(even) {
+  @apply bg-slate-50;
+}
+
+.data-story-body tbody tr:hover {
+  @apply bg-indigo-50/60;
+}
+
+/* Table cells */
+.data-story-body tbody td {
+  @apply px-4 py-3 border-b border-slate-200;
+  border-right: 1px solid #e5e7eb; /* vertical lines */
+}
+
+/* Remove last column border */
+.data-story-body tbody td:last-child {
+  border-right: none;
+}
+
+/* Numeric alignment */
+.data-story-body tbody td:not(:first-child) {
+  @apply text-left font-medium tabular-nums;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  padding-bottom: 6px; /* fade space */
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px; /* prevents squeezing = no overlap */
+}
+
+/* Prevent column header overlap */
+.table-scroll th,
+.table-scroll td {
+  white-space: nowrap;
+}
+
+/* Optional premium: smooth scrollbar */
+.table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+/* Replies indentation */
+.comment-reply {
+  border-left: 2px solid #e5e7eb;
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+}
+
+/* ---- FAQ Accordion ---- */
+.ig-faq {
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.faq-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-icon {
+  transition: 0.3s ease;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  display: none;
+  padding-bottom: 1rem;
+  color: #4b5563;
+}
+
+.faq-item.active .faq-answer {
+  display: block;
+}
+
+.faq-accordion.active .faq-answer {
+  display: block;
 }

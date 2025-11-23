@@ -8,18 +8,18 @@ import { supabase } from "../../lib/supabaseClient";
 import IGHeader from "../../components/IGHeader";
 import IGFooter from "../../components/IGFooter";
 import BreadcrumbHeader from "../../components/BreadcrumbHeader";
-import GraphHeader from "./components/GraphHeader";
-import GraphFilters from "./components/GraphFilters";
-import GraphStats from "./components/GraphStats";
-import GraphChart from "./components/GraphChart";
-import GraphAbout from "./components/GraphAbout";
-import RelatedGraphs from "./components/RelatedGraphs";
+import GraphHeader from "./components/DataHeader";
+import GraphFilters from "./components/DataFilters";
+import GraphStats from "./components/DataStats";
+import GraphChart from "./components/DataChart";
+import GraphAbout from "./components/DataAbout";
+import RelatedGraphs from "./components/DataRelated";
 import { metricBehaviorLogic } from "../../config/metricBehaviorLogic";
-import AskThisGraph from "./components/AskThisGraph";
+import AskThisGraph from "./components/DataAsk";
 //import IGHeader from "@/app/components/IGHeader";
 
-export default function GraphPage() {
-  const { slug } = useParams();
+export default function DataPage({ slug }: { slug: string }) {
+  
 
   // 🔹 States
   const [graph, setGraph] = useState<any>(null);
@@ -70,7 +70,7 @@ useEffect(() => {
   return;
 }
 
-const apiUrl = `${window.location.origin}/api/graph/${encodeURIComponent(slug)}`;
+const apiUrl = `/api/graph/${encodeURIComponent(slug)}`;
 const res = await fetch(apiUrl, { cache: "no-store" });
       const graphData = await res.json();
 

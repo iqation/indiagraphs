@@ -200,7 +200,14 @@ export default function GraphChart({
           maxRotation: 0,
         },
       },
-      y: {
+      y:  {
+    title: {
+      display: true,
+      text: unit ? `${unit}` : "Value",
+      color: "#374151",
+      font: { size: 12, weight: 600 },
+      padding: { bottom: 10 },
+    },
         grid: {
           color: "rgba(0,0,0,0.04)",
           ...( { drawBorder: false } as any ),
@@ -218,8 +225,31 @@ export default function GraphChart({
   };
 
   return (
-    <div className="bg-gradient-to-br from-white via-[#f8f9ff] to-[#eef2ff] rounded-2xl p-5 sm:p-6 border border-white/60 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition-all h-[420px]">
-      <Line ref={chartRef} data={data} options={options} />
+  <div className="relative bg-gradient-to-br from-white via-[#f8f9ff] to-[#eef2ff] rounded-2xl p-5 sm:p-6 border border-white/60 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition-all h-[420px]">
+
+   {/* Cards Container (OUTSIDE chart area) */}
+  <div className="absolute left-0 right-0 top-0 flex justify-between px-4 -translate-y-5 pointer-events-none">
+    
+    {/* Start card */}
+    <div className="bg-white/95 backdrop-blur-md shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs">
+      <div className="font-medium text-gray-700">{labels[0]}</div>
+      <div className="font-semibold text-indigo-700">
+        {values[0].toLocaleString("en-IN")} {unit}
+      </div>
     </div>
-  );
+
+    {/* End card */}
+    <div className="bg-white/95 backdrop-blur-md shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs">
+      <div className="font-medium text-gray-700">{labels.at(-1)}</div>
+      <div className="font-semibold text-indigo-700">
+        {(values.at(-1) ?? 0).toLocaleString("en-IN")} {unit}
+      </div>
+    </div>
+
+  </div>
+
+    {/* Chart */}
+    <Line ref={chartRef} data={data} options={options} />
+  </div>
+);
 }

@@ -1,7 +1,10 @@
-import type { Metadata } from "next";
+// src/app/layout.tsx
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./editorial.css";
 import Script from "next/script";
+import type { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,32 +15,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const viewport = {
+// Separate viewport export (Next.js requirement)
+export const viewport: Viewport = {
   themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://data.indiagraphs.com"),
+  metadataBase: new URL("https://indiagraphs.com"),
   title: {
-    default: "Indiagraphs - Interactive Data Stories",
+    default: "India's Data Stories, Interactive Graphs & Insights",
     template: "%s | Indiagraphs",
   },
   description:
-    "Explore India's economy, markets, and data stories through interactive graphs powered by trusted public sources.",
+    "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
   icons: {
-  icon: [
-    { url: "/favicon.ico", type: "image/x-icon" },
-    { url: "/favicon.png", type: "image/png" },
-  ],
-  apple: "/apple-touch-icon.png",
-},
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
-    title: "Indiagraphs - Interactive Graphs & Data Stories",
+    title: "India's Data Stories, Interactive Graphs & Insights | Indiagraphs",
     description:
-      "Discover data-backed visual insights on India’s economy, markets, and policies — interactive and updated regularly.",
-    url: "https://data.indiagraphs.com",
+      "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
+    url: "https://indiagraphs.com",
     siteName: "Indiagraphs",
     images: [
       {
@@ -52,46 +56,36 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Indiagraphs - Explore India's Data",
-    description: "Interactive graphs from India's trusted data sources.",
+    title: "India's Data Stories, Interactive Graphs & Insights | Indiagraphs",
+    description: "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
     creator: "@indiagraphs",
     images: ["/og-image.jpg"],
   },
   alternates: {
-    canonical: "https://data.indiagraphs.com",
+    canonical: "https://indiagraphs.com",
   },
   robots: {
     index: true,
     follow: true,
   },
-  themeColor: "#ffffff",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
 };
+
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
-        {/* ✅ Search Console Verification */}
+        {/* Google Search Console */}
         <meta
           name="google-site-verification"
           content="RkDeLLnLNGuRxZi2dRHYPGRh5CpWOYQuR2W0uQ1r9t0"
         />
-      </head>
 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        {/* ✅ Google Tag Manager (use same container as main site) */}
+        {/* Google Tag Manager */}
         <Script id="gtm-init" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){
@@ -105,8 +99,10 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-P6T2PKQL');
           `}
         </Script>
+      </head>
 
-        {/* ✅ GTM NoScript fallback (for older browsers) */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* GTM noscript */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-P6T2PKQL"
@@ -115,6 +111,8 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
+
+        {children}
       </body>
     </html>
   );

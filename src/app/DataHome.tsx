@@ -1,32 +1,41 @@
+// src/app/data/DataHome.tsx
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   Search,
-  BarChart2,
-  RefreshCcw,
-  Layers,
-  Database,
-  LineChart,
   CreditCard,
-  Users,
   Wallet,
-  BriefcaseBusinessIcon,
+  LineChart,
+  Database,
+  Users,
   PiggyBank,
   CoinsIcon,
+  BriefcaseBusinessIcon,
+  Layers,
+  RefreshCcw,
+  Clock,
+  Building,
+  Zap,
 } from "lucide-react";
 
-import { Clock, Building, Zap, CalendarClock } from "lucide-react";
 import IGHeader from "./components/IGHeader";
 import IGFooter from "./components/IGFooter";
 
-export default function GraphsHome() {
-  const [graphs, setGraphs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+type GraphSummary = {
+  slug: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  source?: string | null;
+};
+
+export default function DataHome({ graphs }: { graphs: GraphSummary[] }) {
+  const safeGraphs = graphs ?? [];
 
   const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<GraphSummary[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [visibleCount, setVisibleCount] = useState(12);
@@ -96,22 +105,7 @@ export default function GraphsHome() {
     ? ALL_CATEGORIES
     : ALL_CATEGORIES.slice(0, 6);
 
-  useEffect(() => {
-    async function fetchGraphs() {
-      try {
-        const res = await fetch("/api/graphs", { cache: "no-store" });
-        const data = await res.json();
-        setGraphs(data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchGraphs();
-  }, []);
-
+  // 🔎 SEARCH (runs on client only, no network)
   useEffect(() => {
     if (!search.trim()) {
       setSearchResults([]);
@@ -120,16 +114,21 @@ export default function GraphsHome() {
 
     const q = search.toLowerCase();
 
-    const results = graphs.filter(
-      (g) =>
-        g.title.toLowerCase().includes(q) ||
-        g.category?.toLowerCase().includes(q) ||
-        g.source?.toLowerCase().includes(q)
-    );
+    const results = safeGraphs.filter((g) => {
+      const title = g.title?.toLowerCase() || "";
+      const cat = g.category?.toLowerCase() || "";
+      const src = g.source?.toLowerCase() || "";
+      return (
+        title.includes(q) ||
+        cat.includes(q) ||
+        src.includes(q)
+      );
+    });
 
     setSearchResults(results.slice(0, 8));
-  }, [search, graphs]);
+  }, [search, safeGraphs]);
 
+  // Click outside search dropdown → close
   useEffect(() => {
     function outside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -140,22 +139,18 @@ export default function GraphsHome() {
     return () => document.removeEventListener("click", outside);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-indigo-700 font-bold">
-        Loading graphs...
-      </div>
-    );
-  }
-
-  const displayedGraphs = graphs.slice(0, visibleCount);
+  // Memoized visible graphs
+  const displayedGraphs = useMemo(
+    () => safeGraphs.slice(0, visibleCount),
+    [safeGraphs, visibleCount]
+  );
 
   return (
     <>
       <IGHeader />
 
       {/* HERO ----------------------------------------------------- */}
-      <section className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef4ff] pt-20 pb-14 border-b relative overflow-hidden">
+      <section className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef4ff] pt-10 pb-14 border-b relative overflow-visible z-10">
         <div className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-gradient-to-br from-indigo-200/50 via-purple-200/40 to-sky-200/40 blur-3xl" />
         <div className="pointer-events-none absolute bottom-[-4rem] left-[-3rem] h-48 w-48 rounded-full bg-gradient-to-tr from-amber-200/40 via-pink-200/40 to-indigo-200/30 blur-3xl" />
 
@@ -171,13 +166,13 @@ export default function GraphsHome() {
 
           <p className="text-slate-700 font-medium max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
             From macro indicators like GDP & inflation to granular views on
-            payments, trade, and savings - explore ready to use graphs powered
+            payments, trade, and savings – explore ready to use graphs powered
             by verified Indian sources.
           </p>
 
           {/* SEARCH ------------------------------------------------ */}
           <div
-            className="relative max-w-xl mx-auto mt-7"
+            className="relative max-w-xl mx-auto mt-7 z-[9999]"
             ref={dropdownRef}
           >
             <div className="relative">
@@ -192,16 +187,16 @@ export default function GraphsHome() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full bg-white/90 border border-gray-200 rounded-2xl py-3.5 pl-11 pr-4 shadow-sm
-                             focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 text-sm sm:text-base font-medium text-slate-800"
+                           focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 text-sm sm:text-base font-medium text-slate-800"
               />
             </div>
 
             {searchResults.length > 0 && (
-              <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-72 overflow-y-auto z-[200]">
+              <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-72 overflow-y-auto z-[9999]">
                 {searchResults.map((g) => (
                   <Link
                     key={g.slug}
-                    href={`/graphs/${g.slug}`}
+                    href={`/data/${g.slug}`}
                     className="block px-4 py-3 hover:bg-gray-50 transition"
                     onClick={() => setSearchResults([])}
                   >
@@ -249,12 +244,12 @@ export default function GraphsHome() {
                          bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600
                          shadow-lg shadow-indigo-500/30
                          transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl
-                         overflow-hidden"
+                         overflow-visible"
             >
               <span className="relative flex items-center gap-2">
                 Explore All Datasets
                 <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full border border-white/30">
-                  {graphs.length}+ graphs
+                  {safeGraphs.length}+ graphs
                 </span>
               </span>
             </button>
@@ -278,7 +273,6 @@ export default function GraphsHome() {
       <section className="bg-white">
         <div className="max-w-6xl mx-auto px-6 py-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-indigo-600">
                 Why Indiagraphs
@@ -325,7 +319,6 @@ export default function GraphsHome() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -361,56 +354,63 @@ export default function GraphsHome() {
       </section>
 
       {/* ALL GRAPHS ----------------------------------------------- */}
-      <section
-        id="all-graphs"
-        className="max-w-6xl mx-auto px-6 pt-12 pb-16"
-      >
+      <section id="all-graphs" className="max-w-6xl mx-auto px-6 pt-12 pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">All graphs</h2>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            All graphs
+          </h2>
           <p className="text-xs text-slate-600 font-semibold">
-            Showing {displayedGraphs.length} of {graphs.length} graphs
+            Showing {displayedGraphs.length} of {safeGraphs.length} graphs
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayedGraphs.map((graph) => (
-            <Link
-              key={graph.slug}
-              href={`/graphs/${graph.slug}`}
-              className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-            >
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight">
-                {graph.title}
-              </h3>
-              <p className="text-slate-600 text-xs sm:text-sm mt-2 line-clamp-2 font-medium leading-relaxed">
-                {graph.description}
-              </p>
+        {safeGraphs.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            No graphs available yet. Please check back soon.
+          </p>
+        ) : (
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedGraphs.map((graph) => (
+                <Link
+                  key={graph.slug}
+                  href={`/data/${graph.slug}`}
+                  className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight">
+                    {graph.title}
+                  </h3>
+                  <p className="text-slate-600 text-xs sm:text-sm mt-2 line-clamp-2 font-medium leading-relaxed">
+                    {graph.description}
+                  </p>
 
-              <div className="flex flex-wrap gap-2 mt-3">
-                {graph.category && (
-                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-[11px] rounded-full font-semibold">
-                    {graph.category}
-                  </span>
-                )}
-                {graph.source && (
-                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-[11px] rounded-full font-semibold">
-                    {graph.source}
-                  </span>
-                )}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {graph.category && (
+                      <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-[11px] rounded-full font-semibold">
+                        {graph.category}
+                      </span>
+                    )}
+                    {graph.source && (
+                      <span className="px-3 py-1 bg-amber-50 text-amber-700 text-[11px] rounded-full font-semibold">
+                        {graph.source}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {visibleCount < safeGraphs.length && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 9)}
+                  className="px-6 py-2.5 bg-indigo-600 text-white rounded-full font-bold shadow hover:scale-105 transition"
+                >
+                  Load more graphs
+                </button>
               </div>
-            </Link>
-          ))}
-        </div>
-
-        {visibleCount < graphs.length && (
-          <div className="flex justify-center mt-10">
-            <button
-              onClick={() => setVisibleCount((prev) => prev + 9)}
-              className="px-6 py-2.5 bg-indigo-600 text-white rounded-full font-bold shadow hover:scale-105 transition"
-            >
-              Load more graphs
-            </button>
-          </div>
+            )}
+          </>
         )}
       </section>
 
@@ -422,7 +422,7 @@ export default function GraphsHome() {
           </h2>
           <p className="text-slate-600 mt-2 max-w-xl mx-auto font-medium leading-relaxed">
             Whether you are running a desk, a fund, a startup, or a research
-            project - Indiagraphs helps you plug into India’s data with less
+            project – Indiagraphs helps you plug into India’s data with less
             friction.
           </p>
 
@@ -439,7 +439,7 @@ export default function GraphsHome() {
             </button>
 
             <Link
-              href="https://indiagraphs.com/contact/"
+              href="/contact/"
               className="px-6 py-3 border text-slate-700 rounded-lg font-semibold hover:bg-gray-100 transition"
             >
               Contact sales for enterprise solutions

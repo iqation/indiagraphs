@@ -1,0 +1,115 @@
+/* Core layout */
+.editorial {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.12rem;
+  line-height: 1.78;
+  color: #1e293b;
+  max-width: 100%;
+  margin-top: 2.5rem;
+}
+
+/* Paragraphs */
+.editorial p {
+  margin: 1.4rem 0;
+  font-weight: 400;
+}
+
+/* Headings */
+.editorial h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.editorial h3 {
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-top: 2.2rem;
+  margin-bottom: 0.7rem;
+  color: #0f172a;
+}
+
+/* Lists */
+.editorial ul,
+.editorial ol {
+  margin: 1.4rem 0;
+  padding-left: 1.4rem;
+}
+
+.editorial li {
+  margin: 0.4rem 0;
+  padding-left: 0.2rem;
+}
+
+/* Blockquote */
+.editorial blockquote {
+  border-left: 4px solid #6366f1;
+  padding-left: 1.2rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: #475569;
+  background: #f8fafc;
+  border-radius: 0.25rem;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+/* Tables */
+.editorial table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.95rem;
+}
+
+.editorial table th,
+.editorial table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem;
+}
+
+.editorial table th {
+  background: #f1f5f9;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Images */
+.editorial img {
+  width: 100%;
+  margin: 1.8rem 0;
+  border-radius: 14px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+}
+
+/* Links */
+.editorial a {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+/* Pull quotes */
+.editorial .pull-quote {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #334155;
+  border-left: 4px solid #818cf8;
+  padding-left: 1rem;
+  margin: 2.5rem 0;
+  line-height: 1.45;
+}
+
+/* Title / subtitle styling */
+.editorial-title {
+  font-family: "Inter", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.editorial-subtitle {
+  font-family: "Inter", sans-serif;
+  letter-spacing: -0.01em;
+}

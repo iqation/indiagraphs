@@ -23,10 +23,7 @@ export default function BreadcrumbHeader({
       </Link>
       <ChevronRight size={14} className="text-gray-400" />
 
-      {/* 📊 Graphs - Data subdomain */}
-      <Link href="https://data.indiagraphs.com" className="hover:text-indigo-600 transition">
-        Graphs
-      </Link>
+    
 
       {/* 🗂️ Category */}
       {hasValidCategory && (

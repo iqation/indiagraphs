@@ -57,7 +57,6 @@ export const metricBehaviorLogic = {
     ];
   },
 
-  // 💱 Forex data (USD-INR, Euro-INR, etc.)
   forex: (values, cagr, totalReturn, yearsText, unit) => {
     const valid = values.filter((v) => !isNaN(v));
     const latest = valid.at(-1)?.toFixed(2) ?? "--";
@@ -72,7 +71,6 @@ export const metricBehaviorLogic = {
     ];
   },
 
-  // 🌾 Trade & Export metrics (spices, imports, exports, etc.)
   trade: (values, cagr, totalReturn, yearsText, unit) => {
     const valid = values.filter((v) => !isNaN(v));
     const max = valid.length
@@ -89,14 +87,52 @@ export const metricBehaviorLogic = {
     ];
   },
 
+  /**
+   * 🚀 NEW & IMPROVED — Digital Payments, Volumes, Monthly data
+   * For metric_behavior = "value"
+   * Shows: MoM growth, Total Growth, Period
+   */
   value: (values, cagr, totalReturn, yearsText, unit) => {
     const valid = values.filter((v) => !isNaN(v));
+
+    // detect monthly payment-like datasets
+    const isMonthly =
+      values.length > 12 ||
+      unit?.includes("cr") ||
+      unit?.includes("Cr") ||
+      unit?.includes("₹") ||
+      unit?.includes("transactions");
+
+    if (isMonthly) {
+      // MoM
+      let mom = "--";
+      if (values.length >= 2) {
+        const prev = values.at(-2);
+        const curr = values.at(-1);
+        mom = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(2) + "%" : "--";
+      }
+
+      // Total growth
+      const start = values[0];
+      const end = values.at(-1);
+      const totalGrowth =
+        start > 0 ? (((end - start) / start) * 100).toFixed(2) + "%" : "--";
+
+      return [
+        { label: "MoM Growth", value: mom },
+        { label: "Total Growth", value: totalGrowth },
+        { label: "Period", value: yearsText },
+      ];
+    }
+
+    // fallback for normal datasets
     const max = valid.length
       ? Math.max(...valid).toLocaleString("en-IN")
       : "--";
     const avg = valid.length
       ? (valid.reduce((a, b) => a + b, 0) / valid.length).toFixed(2)
       : "--";
+
     return [
       { label: "Max", value: `${max} ${unit}` },
       { label: "Average", value: `${avg} ${unit}` },
