@@ -15,7 +15,7 @@ const WP_API = "https://cms.indiagraphs.com/wp-json/wp/v2";
 async function fetchStory(slug: string) {
   try {
     const res = await fetch(`${WP_API}/posts?slug=${slug}&_embed`, {
-      cache: "no-store",
+      next: { revalidate: 60 },
       headers: { Accept: "application/json" },
     });
 
@@ -35,7 +35,7 @@ async function fetchRelatedStories(id: number) {
   try {
     const res = await fetch(
       `${WP_API}/posts?categories=191&exclude=${id}&per_page=6&_embed`,
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
     return await res.json();
   } catch {
@@ -68,13 +68,13 @@ async function fetchRankMathSEO(url: string) {
   )}`;
 
   try {
-    const res = await fetch(apiUrl, { cache: "no-store" });
-    if (!res.ok) return { title: "", description: "", canonical: "", ogImage: "", head: "" };
+    const res = await fetch(apiUrl, { next: { revalidate: 60 } });
+    if (!res.ok)
+      return { title: "", description: "", canonical: "", ogImage: "", head: "" };
 
     const data = await res.json();
     const head: string = data?.head || "";
 
-    // Helper to find meta content by several variants
     const findMeta = (patterns: RegExp[]) => {
       for (const p of patterns) {
         const m = head.match(p)?.[1];
@@ -96,8 +96,10 @@ async function fetchRankMathSEO(url: string) {
       /<meta name="description" content="([\s\S]*?)"/i,
     ]);
 
-    const canonical = head.match(/<link rel="canonical" href="([^"]*?)"/i)?.[1] || "";
-    const ogImage = head.match(/<meta property="og:image" content="([^"]*?)"/i)?.[1] || "";
+    const canonical =
+      head.match(/<link rel="canonical" href="([^"]*?)"/i)?.[1] || "";
+    const ogImage =
+      head.match(/<meta property="og:image" content="([^"]*?)"/i)?.[1] || "";
 
     return { title, description, canonical, ogImage, head };
   } catch (e) {
@@ -106,11 +108,10 @@ async function fetchRankMathSEO(url: string) {
   }
 }
 
-// Robust HTML decode for doubly-encoded entities like &amp;amp; -> &
+// Robust HTML decode
 function decodeHtmlEntities(input: string) {
   if (!input) return "";
   let out = he.decode(input);
-  // Repeat decode up to 2 more times if it changes (handles nested encoding)
   for (let i = 0; i < 2; i++) {
     const next = he.decode(out);
     if (next === out) break;
@@ -118,7 +119,6 @@ function decodeHtmlEntities(input: string) {
   }
   return out.trim();
 }
-
 
 function extractFaqFromRankMath(head: string) {
   const schemaMatch = head.match(
@@ -134,7 +134,6 @@ function extractFaqFromRankMath(head: string) {
 
     const graph = schema["@graph"] || [];
 
-    // Find item with FAQPage
     const faqPage = graph.find((item: any) =>
       item["@type"]?.includes("FAQPage")
     );
@@ -152,21 +151,17 @@ function extractFaqFromRankMath(head: string) {
 }
 
 // ---------------------------
-// Dynamic SEO Metadata (Rank Math)
+// Dynamic SEO Metadata
 // ---------------------------
 export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
-  // Some Next versions supply params as a promise-like object; normalize by awaiting.
   const { slug } = (await params) as { slug: string };
   const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
 
-  // Fetch Rank Math SEO
   const seo = await fetchRankMathSEO(fullUrl);
 
-  // Decode entities and trim
   let title = decodeHtmlEntities(seo.title || "");
   let description = decodeHtmlEntities(seo.description || "");
 
-  // Fallback to WP post title/excerpt if Rank Math didn't return usable values
   if (!title || !description) {
     try {
       const story = await fetchStory(slug);
@@ -177,9 +172,7 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
           description = decodeHtmlEntities(excerpt);
         }
       }
-    } catch (e) {
-      // ignore and continue with whatever we have
-    }
+    } catch {}
   }
 
   return {
@@ -212,11 +205,9 @@ export default async function StoryPage({ params }: { params: any }) {
 
   const story = await fetchStory(slug);
 
-  // Fetch SEO to get FAQ data
   const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
   const seo = await fetchRankMathSEO(fullUrl);
 
-  // Extract FAQs
   const faqs = extractFaqFromRankMath(seo.head);
   if (!story) return <div className="p-20 text-center">Not found</div>;
 
@@ -341,8 +332,6 @@ export default async function StoryPage({ params }: { params: any }) {
             </div>
           </div>
         )}
-
-        
 
         <CommentSection postId={story.id} />
       </main>
