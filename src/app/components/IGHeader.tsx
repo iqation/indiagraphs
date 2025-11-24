@@ -13,6 +13,49 @@ export default function IGHeader() {
     setOpenDropdown(openDropdown === key ? null : key);
   };
 
+  const mobileSections = [
+    {
+      key: "data",
+      label: "Data",
+      items: [
+        ["All Datasets", "/#all-graphs"],
+        ["Economy & Macro", "/category/economy"],
+        ["Banking & Credit", "/category/banking"],
+        ["Digital Payments", "/category/digital-payments"],
+        ["Commodities", "/category/commodities"],
+        ["Trade & Exports", "/category/trade"],
+        ["Small Savings", "/category/small-savings"],
+        ["Foreign Exchange", "/category/forex"],
+        ["Social & Demographics", "/category/social"],
+      ],
+    },
+    {
+      key: "solutions",
+      label: "Solutions",
+      items: [
+        ["API Access (Coming Soon)", "#"],
+        ["Enterprise Data Delivery (Coming Soon)", "#"],
+      ],
+    },
+    {
+      key: "about",
+      label: "About",
+      items: [
+        ["About Us", "/about"],
+        ["Contact", "/contact"],
+      ],
+    },
+    {
+      key: "policy",
+      label: "Policy",
+      items: [
+        ["Disclaimer", "/disclaimer"],
+        ["Privacy Policy", "/privacy-policy"],
+        ["Terms & Conditions", "/terms-conditions"],
+      ],
+    },
+  ];
+
   return (
     <header className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-lg border-b border-gray-100 shadow-sm z-[100]">
       <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
@@ -118,10 +161,10 @@ export default function IGHeader() {
               <Link href="/disclaimer" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
                 Disclaimer
               </Link>
-              <Link href="/privacy" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+              <Link href="/privacy-policy" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
+              <Link href="/terms-conditions" className="block px-4 py-2 hover:bg-indigo-50 text-sm">
                 Terms & Conditions
               </Link>
             </div>
@@ -146,78 +189,73 @@ export default function IGHeader() {
       {mobileOpen && (
         <div className="md:hidden bg-white border-t shadow-lg px-5 py-4 space-y-3 text-slate-700">
 
-          {/* MOBILE DROPDOWN LISTS */}
-          {[
-            {
-              key: "data",
-              label: "Data",
-              items: [
-                ["All Datasets", "/#all-graphs"],
-                ["Economy & Macro", "/category/economy"],
-                ["Banking & Credit", "/category/banking"],
-                ["Digital Payments", "/category/digital-payments"],
-                ["Commodities", "/category/commodities"],
-                ["Trade & Exports", "/category/trade"],
-                ["Small Savings", "/category/small-savings"],
-                ["Foreign Exchange", "/category/forex"],
-                ["Social & Demographics", "/category/social"],
-              ],
-            },
-            {
-              key: "solutions",
-              label: "Solutions",
-              items: [
-                ["API Access (Coming Soon)", "#"],
-                ["Enterprise Data Delivery (Coming Soon)", "#"],
-              ],
-            },
-            {
-              key: "about",
-              label: "About",
-              items: [
-                ["About Us", "/about"],
-                ["Contact", "/contact"],
-              ],
-            },
-            {
-              key: "policy",
-              label: "Policy",
-              items: [
-                ["Disclaimer", "/disclaimer"],
-                ["Privacy Policy", "/privacy"],
-                ["Terms & Conditions", "/terms"],
-              ],
-            },
-          ].map((section) => (
-            <div key={section.key}>
-              <button
-                onClick={() => toggleDropdown(section.key)}
-                className="flex justify-between w-full py-2 font-medium"
-              >
-                {section.label}
-                <ChevronDown
-                  size={18}
-                  className={`transition ${
-                    openDropdown === section.key ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+          {/* Render Data section first */}
+          {mobileSections.length > 0 && (
+            <>
+              {/* Data (first) */}
+              <div key={mobileSections[0].key}>
+                <button
+                  onClick={() => toggleDropdown(mobileSections[0].key)}
+                  className="flex justify-between w-full py-2 font-medium"
+                >
+                  {mobileSections[0].label}
+                  <ChevronDown
+                    size={18}
+                    className={`transition ${
+                      openDropdown === mobileSections[0].key ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-              {openDropdown === section.key && (
-                <div className="ml-3 mt-1 space-y-1 border-l border-gray-300 pl-3">
-                  {section.items.map(([label, url]) => (
-                    <Link
-                      key={label}
-                      href={url}
-                      className="block py-1 text-sm hover:text-indigo-600"
-                    >
-                      {label}
-                    </Link>
-                  ))}
+                {openDropdown === mobileSections[0].key && (
+                  <div className="ml-3 mt-1 space-y-1 border-l border-gray-300 pl-3">
+                    {mobileSections[0].items.map(([label, url]) => (
+                      <Link
+                        key={label}
+                        href={url}
+                        className="block py-1 text-sm hover:text-indigo-600"
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Independent Data Stories link (aligned with other top-level items) */}
+              <Link href="/data-stories" className="block py-2 font-medium hover:text-indigo-600">
+                Data Stories
+              </Link>
+
+              {/* Render remaining sections */}
+              {mobileSections.slice(1).map((section) => (
+                <div key={section.key}>
+                  <button
+                    onClick={() => toggleDropdown(section.key)}
+                    className="flex justify-between w-full py-2 font-medium"
+                  >
+                    {section.label}
+                    <ChevronDown
+                      size={18}
+                      className={`transition ${
+                        openDropdown === section.key ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {openDropdown === section.key && (
+                    <div className="ml-3 mt-1 space-y-1 border-l border-gray-300 pl-3">
+                      {section.items.map(([label, url]) => (
+                        <Link key={label} href={url} className="block py-1 text-sm hover:text-indigo-600">
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              ))}
+            </>
+          )}
 
           {/* CTA */}
           <Link
