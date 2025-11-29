@@ -9,6 +9,11 @@ export const dynamic = "force-dynamic";
 
 const WP_API = "https://cms.indiagraphs.com/wp-json/wp/v2";
 
+type FAQItem = {
+  question: string;
+  answer: string;
+};
+
 // ---------------------------
 // Fetch story
 // ---------------------------
@@ -52,6 +57,7 @@ function normalize(html: string) {
   out = out.replace(/<figure[^>]*class="wp-block-table"[^>]*>/gi, "");
   out = out.replace(/<\/figure>/gi, "");
 
+  // wrap all tables in scroll container for responsive behavior
   out = out.replace(
     /<table([\s\S]*?)<\/table>/gi,
     `<div class="table-scroll"><table$1</table></div>`
@@ -120,14 +126,14 @@ function decodeHtmlEntities(input: string) {
   return out.trim();
 }
 
-function extractFaqFromRankMath(head: string) {
+function extractFaqFromRankMath(head: string): FAQItem[] {
   const schemaMatch = head.match(
     /<script type="application\/ld\+json" class="rank-math-schema">([\s\S]*?)<\/script>/
   );
 
   if (!schemaMatch) return [];
 
-  let schemaJson = schemaMatch[1];
+  const schemaJson = schemaMatch[1];
 
   try {
     const schema = JSON.parse(schemaJson);
@@ -141,7 +147,7 @@ function extractFaqFromRankMath(head: string) {
     if (!faqPage || !faqPage.mainEntity) return [];
 
     return faqPage.mainEntity.map((faq: any) => ({
-      question: faq.name,
+      question: faq.name as string,
       answer: faq.acceptedAnswer?.text || "",
     }));
   } catch (e) {
@@ -153,7 +159,11 @@ function extractFaqFromRankMath(head: string) {
 // ---------------------------
 // Dynamic SEO Metadata
 // ---------------------------
-export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: any;
+}): Promise<Metadata> {
   const { slug } = (await params) as { slug: string };
   const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
 
@@ -214,20 +224,29 @@ export default async function StoryPage({ params }: { params: any }) {
   const related = await fetchRelatedStories(story.id);
   const title = he.decode(story.title.rendered);
   const content = normalize(story.content.rendered);
-  const cover = story._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+  const cover = story._embedded?.["wp:featuredmedia"]?.[0]?.source_url as
+    | string
+    | undefined;
 
   const words = story.content.rendered
     .replace(/<[^>]+>/g, "")
     .split(/\s+/).length;
   const readTime = Math.max(2, Math.ceil(words / 200));
 
+  const formattedDate = new Date(story.date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return (
     <>
       <IGHeader />
 
+      {/* DESKTOP COVER IMAGE (above content) */}
       {cover && (
-        <div className="w-full bg-white pt-20">
-          <div className="max-w-5xl mx-auto">
+        <div className="hidden sm:block w-full bg-white pt-20">
+          <div className="w-full max-w-3xl mx-auto px-4 sm:px-6">
             <img
               src={cover}
               alt={title}
@@ -240,66 +259,122 @@ export default async function StoryPage({ params }: { params: any }) {
       <main
         className="
           relative 
-          max-w-3xl 
+          max-w-full
+          sm:max-w-3xl 
           mx-auto 
-          px-6 
+          px-3
+          sm:px-6
           mt-[-50px] 
           z-[10]
+          bg-white
         "
       >
-        <div className="bg-white border border-slate-200 shadow-sm px-8 py-10 rounded-xl">
+        {/* MOBILE TITLE + META (top) */}
+        <div className="sm:hidden mt-20 mb-4 px-1">
           <Link
             href="/data-stories"
-            className="text-sm text-indigo-600 hover:underline"
+            className="text-xs text-indigo-600 hover:underline"
           >
             ← Back to Data Stories
           </Link>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-4">
+          <h1 className="text-2xl font-bold editorial-title text-slate-900 mt-3 leading-snug">
             {title}
           </h1>
 
-          <div className="flex items-center gap-3 text-sm text-slate-500 mt-4">
-            <span>
-              {new Date(story.date).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            </span>
-
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-slate-500 mt-2">
+            <span>{formattedDate}</span>
             <span>• {readTime} min read</span>
-
             <span>•</span>
-
             <span className="text-indigo-600 font-semibold">
               Indiagraphs Insights
             </span>
           </div>
 
+          {cover && (
+            <div className="mt-4">
+              <img
+                src={cover}
+                alt={title}
+                className="w-full rounded-xl shadow-md object-cover"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Main article container: full-width on mobile, card on desktop */}
+        <div
+          className="
+            article-card
+            bg-white border border-slate-200 shadow-sm
+            px-4 sm:px-8
+            py-6 sm:py-10
+            sm:rounded-xl
+          "
+        >
+          {/* Back link (desktop) */}
+          <Link
+            href="/data-stories"
+            className="hidden sm:inline-block text-sm text-indigo-600 hover:underline"
+          >
+            ← Back to Data Stories
+          </Link>
+
+          {/* Title + meta (desktop) */}
+          <h1 className="hidden sm:block text-3xl sm:text-4xl font-extrabold text-slate-900 mt-4 editorial-title">
+            {title}
+          </h1>
+
+          <div className="hidden sm:flex items-center gap-3 text-sm text-slate-500 mt-4">
+            <span>{formattedDate}</span>
+            <span>• {readTime} min read</span>
+            <span>•</span>
+            <span className="text-indigo-600 font-semibold">
+              Indiagraphs Insights
+            </span>
+          </div>
+
+          {/* ARTICLE BODY – uses editorial.css + table-scroll for tables */}
           <article
             className="
-              data-story-body  
-              prose 
-              prose-indigo 
+              editorial
+              data-story-body
               max-w-none 
-              mt-8
-              prose-h2:text-3xl prose-h2:font-bold prose-h2:mt-12 prose-h2:mb-4
-              prose-h3:text-2xl prose-h3:font-semibold prose-h3:mt-10 prose-h3:mb-3
-              prose-p:text-[1.07rem] prose-p:leading-8
-              prose-li:text-[1.05rem] prose-li:leading-7
-              prose-table:border prose-table:border-slate-300
-              prose-th:bg-slate-100 
-              prose-th:px-3 prose-th:py-2
-              prose-td:px-3 prose-td:py-2
+              mt-6
             "
             dangerouslySetInnerHTML={{ __html: content }}
           />
-        </div>
 
+          {/* FAQ section (from RankMath schema) */}
+       {/*   {faqs.length > 0 && (
+            <section className="ig-faq mt-10">
+              <h2 className="editorial-subtitle text-xl sm:text-2xl font-semibold mb-4 text-slate-900">
+                Frequently Asked Questions
+              </h2>
+              <div>
+                {faqs.map((faq: FAQItem, idx: number) => (
+                  <div key={idx} className="faq-item active">
+                    <button type="button" className="faq-question">
+                      <span>{faq.question}</span>
+                      <span className="faq-icon">+</span>
+                    </button>
+                    <div
+                      className="faq-answer"
+                      dangerouslySetInnerHTML={{ __html: faq.answer }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )} */}
+        </div>  
+
+        {/* Related stories */}
         {related.length > 0 && (
           <div className="mt-16 mb-20">
-            <h2 className="text-2xl font-bold mb-6">Related Data Stories</h2>
+            <h2 className="text-2xl font-bold mb-6 editorial-subtitle">
+              Related Data Stories
+            </h2>
 
             <div className="grid sm:grid-cols-2 gap-6">
               {related.map((item: any) => (
@@ -312,11 +387,12 @@ export default async function StoryPage({ params }: { params: any }) {
                     <img
                       src={item._embedded["wp:featuredmedia"][0].source_url}
                       className="w-full h-40 object-cover rounded-t-xl"
+                      alt={he.decode(item.title.rendered)}
                     />
                   )}
                   <div className="p-4">
                     <h3
-                      className="font-semibold text-slate-900 hover:underline"
+                      className="font-semibold text-slate-900 hover:underline editorial-subtitle"
                       dangerouslySetInnerHTML={{
                         __html: he.decode(item.title.rendered),
                       }}

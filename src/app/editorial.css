@@ -1,88 +1,88 @@
-/* Core layout */
+/* ---------------------------------------------------------
+   WORLD-CLASS NEWS EDITORIAL TYPOGRAPHY (Mobile-First)
+   Optimized for long-form reading
+---------------------------------------------------------- */
+
+/* Base layout */
 .editorial {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.12rem;
-  line-height: 1.78;
+  font-size: 1.05rem;          /* Mobile size */
+  line-height: 1.58;           /* Tight + readable */
   color: #1e293b;
   max-width: 100%;
-  margin-top: 2.5rem;
 }
 
 /* Paragraphs */
 .editorial p {
-  margin: 1.4rem 0;
-  font-weight: 400;
+  margin: 0.95rem 0;            /* tighter for news style */
 }
 
-/* Headings */
+/* H2 — main section titles */
 .editorial h2 {
-  font-size: 1.9rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.28;
   color: #0f172a;
-  line-height: 1.3;
 }
 
+/* H3 — sub titles */
 .editorial h3 {
-  font-size: 1.45rem;
+  font-size: 1.18rem;
   font-weight: 600;
-  margin-top: 2.2rem;
-  margin-bottom: 0.7rem;
+  margin-top: 1.4rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.32;
   color: #0f172a;
+}
+
+/* Desktop scaling */
+@media (min-width: 640px) {
+  .editorial {
+    font-size: 1.15rem;        /* Desktop */
+    line-height: 1.62;
+  }
+  .editorial h2 {
+    font-size: 1.9rem;
+    margin-top: 2.4rem;
+  }
+  .editorial h3 {
+    font-size: 1.45rem;
+    margin-top: 2rem;
+  }
 }
 
 /* Lists */
 .editorial ul,
 .editorial ol {
-  margin: 1.4rem 0;
+  margin: 1.2rem 0;
   padding-left: 1.4rem;
 }
-
 .editorial li {
-  margin: 0.4rem 0;
-  padding-left: 0.2rem;
+  margin: 0.3rem 0;
 }
 
-/* Blockquote */
+/* Blockquotes */
 .editorial blockquote {
   border-left: 4px solid #6366f1;
-  padding-left: 1.2rem;
-  margin: 2rem 0;
+  padding-left: 1rem;
+  margin: 1.6rem 0;
   font-style: italic;
-  color: #475569;
   background: #f8fafc;
-  border-radius: 0.25rem;
-  padding-top: 0.8rem;
-  padding-bottom: 0.8rem;
-}
-
-/* Tables */
-.editorial table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 2rem 0;
-  font-size: 0.95rem;
-}
-
-.editorial table th,
-.editorial table td {
-  border: 1px solid #e2e8f0;
-  padding: 0.8rem;
-}
-
-.editorial table th {
-  background: #f1f5f9;
-  font-weight: 700;
-  color: #0f172a;
+  padding: 0.7rem 1rem;
+  border-radius: 4px;
+  color: #475569;
 }
 
 /* Images */
-.editorial img {
-  width: 100%;
-  margin: 1.8rem 0;
-  border-radius: 14px;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+.editorial img,
+.editorial figure img {
+  width: 100% !important;
+  height: auto;
+  margin: 1.3rem 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
 }
 
 /* Links */
@@ -94,22 +94,43 @@
 
 /* Pull quotes */
 .editorial .pull-quote {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: #334155;
   border-left: 4px solid #818cf8;
-  padding-left: 1rem;
-  margin: 2.5rem 0;
-  line-height: 1.45;
+  padding-left: 0.9rem;
+  margin: 2rem 0;
 }
 
-/* Title / subtitle styling */
+/* Titles on top */
 .editorial-title {
   font-family: "Inter", sans-serif;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .editorial-subtitle {
   font-family: "Inter", sans-serif;
   letter-spacing: -0.01em;
 }
+/* ---------------------------------------------
+   MOBILE TABLE FIX — prevent column overflow
+---------------------------------------------- */
+
+@media (max-width: 640px) {
+  .editorial table {
+    font-size: 0.78rem !important;     /* smaller tables on mobile */
+  }
+
+  .editorial table th,
+  .editorial table td {
+    padding: 0.55rem 0.35rem !important;
+    white-space: normal !important;     /* allow wrapping */
+    line-height: 1.25;
+  }
+
+  .editorial table th {
+    font-size: 0.82rem !important;
+    font-weight: 600;
+  }
+}
+

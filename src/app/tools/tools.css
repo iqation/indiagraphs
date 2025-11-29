@@ -1,0 +1,665 @@
+/* app/tools/tools.css */
+
+/* -------------------------------------------------
+   Common styles for all calculators under /tools
+   (trying to keep it simple & human, nothing too fancy)
+-------------------------------------------------- */
+
+:root {
+  --tool-brand: #0064ff;
+  --tool-brand-dark: #045c97;
+  --tool-text: #1a1a1a;
+  --tool-muted: #6b7280;
+  --tool-panel: #ffffff;
+  --tool-bg: #f7fafc;
+  --tool-accent: #e8f4fd;
+}
+
+/* main wrapper for the whole tools section */
+.tool-main-wrapper {
+  padding: 16px 0 32px;
+  background: #f7fafc; /* slightly off-white, calculators feel like a "work area" */
+}
+
+/* just keeps things from going too wide */
+.tool-main-inner {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* breadcrumb at top of each tool (page decides the labels) */
+.tool-breadcrumb {
+  font-size: 0.85rem;
+  margin: 8px 0 4px;
+  color: var(--tool-muted);
+}
+
+.tool-breadcrumb a {
+  color: var(--tool-brand);
+  text-decoration: none;
+}
+
+.tool-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* main calculator panel */
+.tool-container {
+  margin-top: 10px;
+  background: var(--tool-panel);
+  padding: 20px 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+}
+
+/* single-tool headings */
+.tool-title {
+  font-size: 1.6rem;
+  margin: 0 0 0.25rem;
+  color: var(--tool-text);
+}
+
+.tool-sublead {
+  color: var(--tool-muted);
+  font-size: 0.95rem;
+  margin: 0.25rem 0 1.1rem;
+}
+
+/* labels + help text */
+.tool-label {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--tool-text);
+}
+
+.tool-help {
+  font-size: 0.85rem;
+  color: var(--tool-muted);
+  margin-top: 0.35rem;
+}
+
+/* inputs and button – fairly generic so all tools can reuse */
+.tool-input,
+.tool-select,
+.tool-button {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+}
+
+/* it’s fine, we won't overthink focus states */
+.tool-input:focus,
+.tool-select:focus {
+  outline: none;
+  border-color: var(--tool-brand);
+  box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.15);
+}
+
+.tool-button {
+  background: var(--tool-brand);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+}
+
+.tool-button:hover {
+  filter: brightness(0.98);
+}
+
+.tool-button:active {
+  transform: translateY(1px);
+}
+
+/* result box */
+.tool-result {
+  margin-top: 1.25rem;
+  background: var(--tool-accent);
+  padding: 1rem;
+  border-left: 4px solid var(--tool-brand-dark);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.tool-result h2 {
+  margin: 0.25rem 0 0.3rem;
+  font-size: 1.25rem;
+}
+
+/* quick KPI row */
+.tool-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 0.75rem;
+}
+
+.tool-kpi {
+  background: #f9fbff;
+  border: 1px dashed #cde4ff;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.tool-kpi strong {
+  display: block;
+  font-size: 1.02rem;
+}
+
+/* details/disclosure area */
+.tool-container details {
+  margin-top: 12px;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* tiny link list under calculators */
+.tool-links {
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.tool-links a {
+  display: inline-block;
+  margin-right: 12px;
+  color: var(--tool-brand);
+  text-decoration: none;
+}
+
+.tool-links a:hover {
+  text-decoration: underline;
+}
+
+/* number input tweaks, because default spinners look ugly */
+.tool-input[type="number"]::-webkit-outer-spin-button,
+.tool-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tool-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* mobile tweaks – nothing too clever here */
+@media (max-width: 600px) {
+  .tool-container {
+    margin-top: 10px;
+    padding: 16px 14px 20px;
+  }
+
+  .tool-title {
+    font-size: 1.35rem;
+  }
+
+  .tool-sublead {
+    font-size: 0.9rem;
+  }
+
+  .tool-kpis {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .tool-sticky-cta {
+    position: sticky;
+    bottom: 8px;
+    z-index: 5;
+    background: transparent;
+    padding-top: 8px;
+  }
+}
+
+.tool-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  margin-top: 0.35rem;
+  border: 1px solid #e7d3a8;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fffdf8;
+}
+
+.tool-input:focus {
+  outline: none;
+  border-color: #e9a21a;
+  box-shadow: 0 0 0 3px rgba(233, 162, 26, 0.25);
+}
+/* ============================================================
+   OMNI-STYLE CALCULATOR DETAIL PAGE LAYOUT
+   (shared by all future /tools/... calculators)
+   ============================================================ */
+
+.tool-detail-page {
+  background: #f3f4f6;        /* light grey canvas */
+  padding: 24px 0 40px;
+}
+
+.tool-detail-inner {
+  max-width: 1120px;          /* wide, like Data Stories */
+  margin: 0 auto;
+  padding: 0 16px;
+  color: #0f172a;
+}
+
+/* breadcrumb at top */
+.tool-detail-breadcrumb {
+  font-size: 0.85rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tool-detail-breadcrumb a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.tool-detail-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* grid: left explanation, right calculator */
+.tool-detail-grid {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 32px;
+}
+
+/* stick the card on desktop */
+.tool-detail-right {
+  flex: 0 0 auto;
+}
+
+.tool-detail-card-sticky {
+  position: static;
+}
+
+.tool-detail-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e5e7eb;
+}
+
+.tool-detail-card h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.tool-detail-card-sub {
+  margin: 0.35rem 0 0.9rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* left panel */
+.tool-detail-left {
+  flex: 1 1 auto;
+}
+
+.tool-detail-header {
+  margin-bottom: 24px;
+}
+
+.tool-detail-updated {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.tool-detail-title {
+  font-size: 2rem;
+  line-height: 1.15;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.tool-detail-tagline {
+  margin: 6px 0 14px;
+  font-size: 0.98rem;
+  color: #4b5563;
+  max-width: 620px;
+}
+
+.tool-detail-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tool-detail-chip {
+  font-size: 0.8rem;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: #f3f4ff;
+  color: #4f46e5;
+}
+
+.tool-detail-chip-category {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+/* creator + helpful row */
+.tool-detail-people-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.tool-detail-creator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tool-detail-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.tool-detail-strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tool-detail-helpful {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.tool-detail-like-icon {
+  font-size: 1rem;
+}
+
+/* share row */
+.tool-detail-share-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.tool-share-btn {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 6px 14px;
+  font-size: 0.83rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tool-share-btn:hover {
+  background: #f9fafb;
+}
+
+/* table of contents */
+.tool-detail-toc {
+  margin: 22px 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.tool-detail-toc h2 {
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.tool-detail-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.tool-detail-toc li + li {
+  margin-top: 4px;
+}
+
+.tool-detail-toc a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.tool-detail-toc a:hover {
+  text-decoration: underline;
+}
+
+/* =============================
+   BEAUTIFIED LEFT-SIDE ARTICLE
+   ============================= */
+
+.tool-detail-article {
+  font-size: 1rem;                /* clean readable base */
+  line-height: 1.75;              /* perfect reading line height */
+  color: #1f2937;                 /* softer than pure black */
+  max-width: 720px;               /* ideal reading width */
+  font-weight: 400;
+}
+
+/* H2 — major section heading */
+.tool-detail-article h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 32px 0 14px;
+  color: #0f172a;
+  letter-spacing: -0.015em;
+  scroll-margin-top: 90px;       /* for TOC anchors */
+}
+
+/* H3 — subsection heading */
+.tool-detail-article h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 22px 0 10px;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 90px;
+}
+
+/* Paragraphs */
+.tool-detail-article p {
+  margin: 14px 0 22px;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #374151;
+}
+
+/* Lists */
+.tool-detail-article ul {
+  padding-left: 1.25rem;
+  margin: 12px 0 22px;
+}
+
+.tool-detail-article li {
+  margin-bottom: 8px;
+  line-height: 1.65;
+  color: #374151;
+}
+
+/* Optional: nicer bullet style */
+.tool-detail-article ul li {
+  list-style-type: disc;
+}
+
+/* Optional subtle HR if you ever use <hr> */
+.tool-detail-article hr {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 32px 0;
+}
+
+/* pseudo-table for assumptions */
+.tool-detail-table {
+  margin: 10px 0 14px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+
+.tool-detail-table-row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr 1.3fr;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 0.86rem;
+}
+
+.tool-detail-table-row:nth-child(odd) {
+  background: #f9fafb;
+}
+
+.tool-detail-table-row > div:first-child {
+  font-weight: 600;
+}
+
+/* formula highlight */
+.tool-detail-formula {
+  margin: 10px 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eef2ff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tool-detail-footnote {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* result in card */
+.tool-result-card {
+  margin-top: 14px;
+  border-radius: 12px;
+  border-left-width: 0;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+}
+
+.tool-result-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+.tool-result-main {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 2px 0 4px;
+}
+
+.tool-result-note {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* full-width button in card */
+.tool-button-full {
+  margin-top: 1rem;
+  width: 100%;
+  border-radius: 999px;
+}
+
+/* Desktop layout tweaks */
+@media (min-width: 900px) {
+  .tool-detail-grid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .tool-detail-left {
+    flex: 1.1;
+  }
+
+  .tool-detail-right {
+    flex: 0.9;
+  }
+
+  .tool-detail-card-sticky {
+    position: sticky;
+    top: 88px; /* under site header */
+  }
+
+  .tool-detail-card {
+    padding: 20px 20px 22px;
+  }
+
+  .tool-detail-title {
+    font-size: 2.1rem;
+  }
+}
+
+/* Mobile-first adjustments */
+@media (max-width: 640px) {
+  .tool-detail-page {
+    padding-top: 8px;
+  }
+
+  .tool-detail-inner {
+    padding: 0 12px 24px;
+  }
+
+  .tool-detail-title {
+    font-size: 1.5rem;
+  }
+
+  .tool-detail-card {
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+  }
+}
+/* Initially hide on all screens */
+.tool-calculator-desktop-header {
+  display: none;
+}
+
+/* Show only on desktop */
+@media (min-width: 900px) {
+  .tool-calculator-desktop-header {
+    display: block;
+    margin-bottom: 16px;
+  }
+}

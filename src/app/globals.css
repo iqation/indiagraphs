@@ -2,9 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --------------------------------------------
+   Base styles + animations (unchanged)
+--------------------------------------------- */
+
 body {
-  @apply bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-gray-800;
+  @apply bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-gray-800 overflow-x-hidden;
 }
+
+/* Shimmer animation */
 @keyframes shimmer {
   0% { background-position: -500px 0; }
   100% { background-position: 500px 0; }
@@ -21,59 +27,21 @@ body {
   animation: shimmer 6s infinite linear;
 }
 
- 
+/* Fade animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out both;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.animate-fadeIn {
-  animation: fadeIn 0.8s ease-out both;
-}
+.animate-fadeInUp { animation: fadeInUp 0.6s ease-out both; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.animate-fadeIn { animation: fadeIn 0.8s ease-out both; }
 
 
-body {
-  @apply bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-gray-800;
-}
-@keyframes shimmer {
-  0% { background-position: -500px 0; }
-  100% { background-position: 500px 0; }
-}
 
-.glossy {
-  background: linear-gradient(
-    110deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.7) 30%,
-    rgba(255, 255, 255, 0.4) 60%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 6s infinite linear;
-}
-
- 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out both;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.animate-fadeIn {
-  animation: fadeIn 0.8s ease-out both;
-}
-
-/* --- WordPress Header Dropdown Fix --- */
+/* --------------------------------------------
+   WordPress header z-index fixes
+--------------------------------------------- */
 
 header,
 #wp-header,
@@ -87,165 +55,134 @@ header,
   z-index: 10000 !important;
 }
 
-/* Prevent Next.js containers from trapping z-index layers */
 main, section, div {
   isolation: isolate;
 }
 
-body {
-  overflow-x: hidden;
-}
-
-/* Make sure WP submenus are always on top */
 .sub-menu,
 .wp-block-navigation__submenu-container {
   position: absolute !important;
   z-index: 999999 !important;
 }
+
 footer {
   position: relative;
   z-index: 10;
+  background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
 }
 
 main {
-  z-index: 0;
   position: relative;
-}
-/* main {
-  background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
-} */
-
-footer {
-  background: linear-gradient(to bottom right, #fdfdfe, #f5f7ff);
+  z-index: 0;
 }
 
 
-/* ---------------------------------------------
-   DATA STORIES — TABLE WITH COLUMN LINES
----------------------------------------------- */
 
-.data-story-body table {
-  @apply w-full border-collapse text-sm my-10 rounded-xl overflow-hidden shadow-sm;
-  table-layout: fixed;
-  border: 1px solid #e2e8f0; /* outer border */
-}
+/* ============================================================
+   🚫 REMOVED COMPLETELY:
+   Old `.data-story-body table` rules (they caused conflicts)
+   ============================================================ */
 
-/* Header */
-.data-story-body thead tr {
-  @apply bg-slate-100;
-}
 
-.data-story-body thead th {
-  @apply px-4 py-3 font-semibold text-slate-700 border-b border-slate-300 text-left;
-  border-right: 1px solid #e5e7eb; /* column lines */
-}
 
-.data-story-body thead th:last-child {
-  border-right: none;
-}
+/* ============================================================
+   ✅ NEW UNIVERSAL MOBILE-FIRST TABLE SYSTEM
+   Powered by `.table-scroll`
+   ============================================================ */
 
-/* Table layout */
-.data-story-body table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto; /* allows natural sizing */
-}
-
-/* Keep header readable */
-.data-story-body thead th {
-  @apply px-4 py-3 font-semibold text-slate-700 border-b border-slate-300 bg-slate-100;
-  border-right: 1px solid #e5e7eb;
-  white-space: nowrap; /* Prevent header overlap */
-}
-
-/* Allow body text to wrap if needed */
-.data-story-body tbody td {
-  @apply px-4 py-3 border-b border-slate-200 font-medium;
-  border-right: 1px solid #e5e7eb;
-  white-space: nowrap; /* Prevent weird breaks */
-}
-
-/* Remove last border */
-.data-story-body thead th:last-child,
-.data-story-body tbody td:last-child {
-  border-right: none;
-}
-
-/* Row striping */
-.data-story-body tbody tr:nth-child(even) {
-  background: #f8fafc;
-}
-
-/* Hover */
-.data-story-body tbody tr:hover {
-  background: #eef2ff;
-}
-
-/* Body rows */
-.data-story-body tbody tr:nth-child(even) {
-  @apply bg-slate-50;
-}
-
-.data-story-body tbody tr:hover {
-  @apply bg-indigo-50/60;
-}
-
-/* Table cells */
-.data-story-body tbody td {
-  @apply px-4 py-3 border-b border-slate-200;
-  border-right: 1px solid #e5e7eb; /* vertical lines */
-}
-
-/* Remove last column border */
-.data-story-body tbody td:last-child {
-  border-right: none;
-}
-
-/* Numeric alignment */
-.data-story-body tbody td:not(:first-child) {
-  @apply text-left font-medium tabular-nums;
-}
-
+/* Wrapper */
 .table-scroll {
   overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  margin: 1.5rem 0;
-  padding-bottom: 6px; /* fade space */
+  margin: 1.25rem 0;
+  padding-bottom: 6px;
 }
 
+/* Base table */
 .table-scroll table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 650px; /* prevents squeezing = no overlap */
 }
 
-/* Prevent column header overlap */
+/* Cells */
 .table-scroll th,
 .table-scroll td {
-  white-space: nowrap;
+  border: 1px solid #e2e8f0;
+  padding: 0.65rem 0.55rem;
+  font-size: 0.95rem;
+  text-align: left;
+  background: white;
+  white-space: nowrap; /* overridden on mobile */
 }
 
-/* Optional premium: smooth scrollbar */
-.table-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-.table-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 8px;
-}
-.table-scroll::-webkit-scrollbar-track {
+/* Header */
+.table-scroll th {
   background: #f1f5f9;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-/* Replies indentation */
-.comment-reply {
-  border-left: 2px solid #e5e7eb;
-  margin-left: 1.5rem;
-  padding-left: 1rem;
+/* Stripe rows */
+.table-scroll tr:nth-child(even) {
+  background: #f8fafc;
 }
 
-/* ---- FAQ Accordion ---- */
+/* Hover (desktop only) */
+@media (min-width: 640px) {
+  .table-scroll tr:hover {
+    background: #eef2ff;
+  }
+}
+
+/* -----------------------------------------
+   📱 MOBILE MODE (1–3 columns auto-fit)
+----------------------------------------- */
+@media (max-width: 640px) {
+  .table-scroll {
+    overflow-x: visible !important;
+  }
+
+  .table-scroll table {
+    min-width: 100% !important;
+    width: 100% !important;
+    table-layout: fixed;
+  }
+
+  .table-scroll th,
+  .table-scroll td {
+    white-space: normal;
+    padding: 0.55rem 0.35rem;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+}
+
+/* -----------------------------------------
+   ➕ SCROLL MODE FOR 4+ COLUMNS
+----------------------------------------- */
+
+.table-scroll[data-cols="4"],
+.table-scroll[data-cols="5"],
+.table-scroll[data-cols="6"],
+.table-scroll[data-cols="7"],
+.table-scroll[data-cols="8"] {
+  overflow-x: auto !important;
+}
+
+.table-scroll[data-cols="4"] table,
+.table-scroll[data-cols="5"] table,
+.table-scroll[data-cols="6"] table,
+.table-scroll[data-cols="7"] table,
+.table-scroll[data-cols="8"] table {
+  min-width: 650px !important;
+}
+
+
+
+/* ============================================================
+   FAQ STYLES (unchanged)
+   ============================================================ */
+
 .ig-faq {
   margin-top: 2rem;
   border-top: 1px solid #e5e7eb;
@@ -269,9 +206,7 @@ footer {
   align-items: center;
 }
 
-.faq-icon {
-  transition: 0.3s ease;
-}
+.faq-icon { transition: 0.3s ease; }
 
 .faq-item.active .faq-icon {
   transform: rotate(45deg);
@@ -287,6 +222,32 @@ footer {
   display: block;
 }
 
-.faq-accordion.active .faq-answer {
-  display: block;
+
+
+/* ============================================================
+   ARTICLE CARD (no card on mobile)
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .article-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* -----------------------------------------
+   Replies indentation
+----------------------------------------- */
+.comment-reply {
+  border-left: 2px solid #e5e7eb;
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+}
+
+body {
+  background: white !important;
 }
