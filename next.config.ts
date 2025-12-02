@@ -21,12 +21,7 @@ const nextConfig: NextConfig = {
         source: "/tools/solar-income-calculator/",
         destination: "/tools/solar-farm-income-calculator",
         permanent: true,
-      },
-    {
-      source: "/:path*/",
-      destination: "/:path*",
-      permanent: true,
-    }
+      }
     
     ];
   },
