@@ -251,3 +251,81 @@ main {
 body {
   background: white !important;
 }
+
+/* ============================================================
+   Savings Schemes Comparison Layout
+   TOC (left) + Main content (right)
+============================================================ */
+
+.ssc-layout {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .ssc-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+/* Left TOC */
+.ssc-toc {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .ssc-toc {
+    display: block;
+    position: sticky;
+    top: 96px;
+    align-self: flex-start;
+  }
+}
+
+.ssc-toc-inner {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+}
+
+.ssc-toc-inner h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.ssc-toc-inner ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ssc-toc-inner li + li {
+  margin-top: 4px;
+}
+
+.ssc-toc-inner a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.ssc-toc-inner a:hover {
+  text-decoration: underline;
+}
+
+/* Right main content */
+.ssc-main {
+  width: 100%;
+}
+
+/* Card for calculator */
+.ssc-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  padding: 18px 18px 20px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}

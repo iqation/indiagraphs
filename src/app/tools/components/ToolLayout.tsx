@@ -1,19 +1,9 @@
+// src/app/tools/components/ToolLayout.tsx
 "use client";
 
+import React from "react";
 import Link from "next/link";
-
-type BreadcrumbItem = { label: string; href?: string };
-type TocItem = { id: string; label: string };
-
-type ToolLayoutProps = {
-  title: string;
-  updated: string;
-  categories?: string[];
-  breadcrumb?: BreadcrumbItem[];
-  toc?: TocItem[];
-  calculator: React.ReactNode;
-  children: React.ReactNode;
-};
+import "../../tools/tools.css";
 
 export function ToolLayout({
   title,
@@ -22,136 +12,114 @@ export function ToolLayout({
   breadcrumb = [],
   toc = [],
   calculator,
-  children,
-}: ToolLayoutProps) {
+  children,          // left text content
+  fullWidthResults,  // NEW — full-width results & charts
+}: {
+  title: string;
+  updated?: string;
+  categories?: string[];
+  breadcrumb?: { label: string; href?: string }[];
+  toc?: { id: string; label: string }[];
+  calculator: React.ReactNode;
+  children: React.ReactNode;
+  fullWidthResults?: React.ReactNode;
+}) {
   return (
-    <div className="tool-detail-page">
-      <div className="tool-detail-inner">
-
-        {/* -------------------------------------------------- */}
-        {/* Breadcrumb */}
-        {/* -------------------------------------------------- */}
-        <nav className="tool-detail-breadcrumb">
-          {breadcrumb.map((b, i) =>
-            b.href ? (
-              <Link key={i} href={b.href}>{b.label}</Link>
+    <main className="bg-[#f8f9fb] min-h-screen py-10">
+      
+      {/* BREADCRUMB */}
+      <div className="max-w-6xl mx-auto px-4 mb-6 text-sm text-slate-600 flex gap-2">
+        {breadcrumb.map((b, i) => (
+          <React.Fragment key={i}>
+            {b.href ? (
+              <Link href={b.href} className="hover:underline text-indigo-600">
+                {b.label}
+              </Link>
             ) : (
-              <span key={i}>&gt; {b.label}</span>
-            )
-          )}
-        </nav>
-
-        {/* MOBILE TITLE */}
-        <div className="tool-detail-mobile-title">
-          <p className="tool-detail-updated">Last updated: {updated}</p>
-          <h1 className="tool-detail-title">{title}</h1>
-        </div>
-
-        {/* -------------------------------------------------- */}
-        {/* GRID */}
-        {/* -------------------------------------------------- */}
-        <div className="tool-detail-grid">
-          
-          {/* ---------- LEFT SIDE ---------- */}
-          <section className="tool-detail-left">
-
-            <div className="tool-detail-header">
-
-              {/* 🌈 PRETTIER CATEGORY CHIPS */}
-              <div className="tool-detail-meta-row">
-                {categories.map((c, i) => (
-                  <span
-                    key={i}
-                    className={`tool-detail-chip ${
-                      i === 0 ? "tool-detail-chip-category" : ""
-                    }`}
-                  >
-                    {c}
-                  </span>
-                ))}
-              </div>
-
-              {/* -------------------------------------------------- */}
-              {/* 🚫 REMOVED CREATOR / LIKES / SHARE (commented out) */}
-              {/* -------------------------------------------------- */}
-
-              {/*
-              <div className="tool-detail-people-row">
-                <div className="tool-detail-creator">
-                  <div className="tool-avatar-circle">IG</div>
-                  <div>
-                    <div className="tool-detail-label">Creator</div>
-                    <div className="tool-detail-strong">
-                      Indiagraphs Tools Team
-                    </div>
-                  </div>
-                </div>
-
-                <div className="tool-detail-helpful">
-                  <span className="tool-detail-like-icon">👍</span>
-                  <span>
-                    <strong>127</strong> people found this helpful
-                  </span>
-                </div>
-              </div>
-
-              <div className="tool-detail-share-row">
-                <button className="tool-share-btn">👍 Like</button>
-
-                <button
-                  className="tool-share-btn"
-                  onClick={() => {
-                    navigator?.clipboard?.writeText(window.location.href);
-                    alert("Link copied!");
-                  }}
-                >
-                  🔗 Copy link
-                </button>
-
-                <button className="tool-share-btn">↗️ Share</button>
-              </div>
-              */}
-            </div>
-
-            {/* TOC */}
-            {toc.length > 0 && (
-              <nav className="tool-detail-toc">
-                <h2>Table of contents</h2>
-                <ul>
-                  {toc.map((item) => (
-                    <li key={item.id}>
-                      <a href={`#${item.id}`}>{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <span>{b.label}</span>
             )}
+            {i < breadcrumb.length - 1 && <span>/</span>}
+          </React.Fragment>
+        ))}
+      </div>
 
-            {/* CONTENT */}
-            <article className="tool-detail-article">{children}</article>
-          </section>
+      {/* PAGE HEADER */}
+      <div className="max-w-6xl mx-auto px-4 mb-10">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          {title}
+        </h1>
 
-          {/* ---------- RIGHT SIDE (Calculator) ---------- */}
-          <aside className="tool-detail-right">
-            <div className="tool-detail-card-sticky">
-              <div className="tool-detail-card">
+        {updated && (
+          <p className="mt-1 text-sm text-slate-500">Updated: {updated}</p>
+        )}
 
-                {/* ✔ CALCULATOR SUBTITLE (desktop only) */}
-                <div className="tool-calculator-desktop-only">
-                  <h2 className="tool-calculator-title">Calculator</h2>
-                  <p className="tool-calculator-sub">
-                    Adjust the inputs and hit calculate to see a rough income figure.
-                  </p>
-                </div>
-
-                {calculator}
-
-              </div>
-            </div>
-          </aside>
-
+        <div className="flex gap-2 flex-wrap mt-3">
+          {categories.map((c) => (
+            <span
+              key={c}
+              className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium"
+            >
+              {c}
+            </span>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* GRID LAYOUT – LEFT CONTENT + RIGHT CALCULATOR */}
+      <div
+        className="
+          max-w-6xl mx-auto px-4 
+          grid grid-cols-1 
+          lg:grid-cols-[minmax(0,1fr)_400px] 
+          gap-10
+        "
+      >
+
+        {/* LEFT SIDE — TEXT CONTENT */}
+        <div className="order-2 lg:order-1 prose max-w-none">
+          
+          {/* TABLE OF CONTENTS */}
+          {toc.length > 0 && (
+            <div className="mb-8 p-4 rounded-xl bg-white shadow border">
+              <h2 className="font-bold text-slate-800 mb-3 text-lg">
+                Table of contents
+              </h2>
+              <ul className="space-y-2">
+                {toc.map((t) => (
+                  <li key={t.id}>
+                    <a
+                      href={`#${t.id}`}
+                      className="text-indigo-600 hover:underline"
+                    >
+                      {t.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Actual content */}
+          {children}
+        </div>
+
+        {/* RIGHT SIDE — CALCULATOR */}
+        <aside className="order-1 lg:order-2">
+          <div className="sticky top-30">
+            <div className="bg-white p-6 rounded-2xl shadow-xl border">
+              {calculator}
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      {/* FULL WIDTH RESULTS (optional new block) */}
+      {fullWidthResults && (
+        <div className="max-w-6xl mx-auto px-4 mt-16">
+          {fullWidthResults}
+        </div>
+      )}
+    </main>
   );
 }

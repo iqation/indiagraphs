@@ -1,3 +1,6 @@
+/*!*********************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./src/app/tools/tools.css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************/
 /* app/tools/tools.css */
 
 /* -------------------------------------------------
@@ -662,4 +665,213 @@
     display: block;
     margin-bottom: 16px;
   }
+}
+
+/* ===============================
+   COMPARISON LAYOUT — Simple Clean
+================================ */
+
+.comparison-grid {
+  display: flex;
+  gap: 32px;
+  margin-top: 28px;
+}
+
+/* LEFT: TOC */
+.comparison-left {
+  width: 240px;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .comparison-left {
+    display: block;
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.comparison-toc-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.comparison-toc-card h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.comparison-toc-card li { margin-bottom: 6px; }
+
+/* RIGHT SIDE */
+.comparison-right {
+  flex: 1;
+  max-width: 720px;
+}
+
+/* Full-width results */
+.comparison-results {
+  margin-top: 32px;
+}
+
+/* ===============================
+   COMPARISON LAYOUT — FINAL VERSION
+================================ */
+
+.comparison-grid {
+  display: flex;
+  gap: 32px;
+  margin-top: 28px;
+}
+
+/* LEFT — TOC */
+.comparison-left {
+  width: 240px;
+  flex-shrink: 0;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .comparison-left {
+    display: block;
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.comparison-toc-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.comparison-toc-card h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.comparison-toc-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comparison-toc-card li {
+  margin-bottom: 6px;
+}
+
+.comparison-toc-card a {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+.comparison-toc-card a:hover {
+  text-decoration: underline;
+}
+
+/* RIGHT — Main Column */
+.comparison-right {
+  flex: 1;
+  min-width: 0;
+  max-width: 760px;
+}
+
+/* Calculator Card */
+.comparison-calculator-card {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
+}
+
+/* Results block (table + charts) */
+.comparison-results {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+
+/* Match select dropdown to input field design */
+.tool-select {
+  background: #fffdf8;
+  border: 1px solid #e7d3a8;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3e%3cpath d='M4.646 6.646a.5.5 0 0 1 .708 0L8 9.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.tool-select:focus {
+  outline: none;
+  border-color: #e9a21a;
+  box-shadow: 0 0 0 3px rgba(233, 162, 26, 0.25);
+}
+
+
+/* Error state for inputs */
+.tool-input-error {
+  border-color: #dc2626 !important;
+  background: #fff1f1 !important;
+  animation: shake 0.25s ease-in-out;
+}
+
+
+/* Error message */
+.tool-error-text {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+.tool-input-error {
+  border-color: #dc2626 !important;
+  background: #fff1f1 !important;
+  animation: shake 0.25s ease-in-out;
+}
+
+/* ============================================================
+   FINAL OVERRIDE — ERROR INPUT (must be last)
+============================================================ */
+
+.tool-input-error {
+  border-color: #dc2626 !important;
+  background: #fff1f1 !important;
+  animation: shake 0.25s ease-in-out !important;
+}
+
+.tool-input-error + .tool-error-text,
+.tool-input-error-message {
+  color: #dc2626 !important;
+  font-size: 0.8rem !important;
+  margin-top: 4px !important;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
 }

@@ -2,10 +2,7 @@
 
 import React from "react";
 
-type Option = {
-  label: string;
-  value: string | number;
-};
+type Option = { label: string; value: string | number };
 
 type ToolInputProps = {
   type?:
@@ -39,6 +36,9 @@ type ToolInputProps = {
   placeholder?: string;
   readOnly?: boolean;
   disabled?: boolean;
+
+  /** NEW */
+  error?: string;
 };
 
 export function ToolInput({
@@ -55,9 +55,11 @@ export function ToolInput({
   placeholder,
   readOnly = false,
   disabled = false,
+  error,
 }: ToolInputProps) {
   return (
     <div className="tool-input-block">
+
       {label && <label className="tool-label">{label}</label>}
       {help && <div className="tool-help">{help}</div>}
 
@@ -65,7 +67,7 @@ export function ToolInput({
       {(type === "text" || type === "number") && (
         <input
           type={type}
-          className="tool-input"
+          className={`tool-input ${error ? "tool-input-error" : ""}`}
           value={value}
           placeholder={placeholder}
           onChange={(e) => !readOnly && onChange(e.target.value)}
@@ -80,7 +82,9 @@ export function ToolInput({
       {/* TEXTAREA */}
       {type === "textarea" && (
         <textarea
-          className="tool-input tool-textarea"
+          className={`tool-input tool-textarea ${
+            error ? "tool-input-error" : ""
+          }`}
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
@@ -90,7 +94,7 @@ export function ToolInput({
       {/* SELECT */}
       {type === "select" && (
         <select
-          className="tool-input"
+          className={`tool-input tool-select ${error ? "tool-input-error" : ""}`}
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
@@ -108,7 +112,9 @@ export function ToolInput({
       {type === "multi-select" && (
         <select
           multiple
-          className="tool-input tool-multiselect"
+          className={`tool-input tool-multiselect ${
+            error ? "tool-input-error" : ""
+          }`}
           value={value}
           onChange={(e) => {
             const vals = Array.from(
@@ -170,7 +176,7 @@ export function ToolInput({
         </>
       )}
 
-      {/* SLIDER + NUMBER COMBO */}
+      {/* SLIDER + NUMBER */}
       {type === "slider-number" && (
         <div className="tool-slider-row">
           <input
@@ -184,7 +190,9 @@ export function ToolInput({
           />
           <input
             type="number"
-            className="tool-input tool-input-mini"
+            className={`tool-input tool-input-mini ${
+              error ? "tool-input-error" : ""
+            }`}
             value={value}
             min={min}
             max={max}
@@ -199,7 +207,7 @@ export function ToolInput({
         <div className="tool-unit-container">
           <input
             type="number"
-            className="tool-input"
+            className={`tool-input ${error ? "tool-input-error" : ""}`}
             value={value}
             disabled={disabled}
             onChange={(e) => onChange(e.target.value)}
@@ -208,23 +216,23 @@ export function ToolInput({
         </div>
       )}
 
-      {/* DATE PICKER */}
+      {/* DATE */}
       {type === "date" && (
         <input
           type="date"
-          className="tool-input"
+          className={`tool-input ${error ? "tool-input-error" : ""}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
       )}
 
-      {/* CURRENCY INPUT */}
+      {/* CURRENCY */}
       {type === "currency" && (
         <div className="tool-unit-container">
           <span className="tool-unit">₹</span>
           <input
             type="number"
-            className="tool-input"
+            className={`tool-input ${error ? "tool-input-error" : ""}`}
             value={value}
             min={min}
             max={max}
@@ -234,12 +242,12 @@ export function ToolInput({
         </div>
       )}
 
-      {/* PERCENTAGE INPUT */}
+      {/* PERCENT */}
       {type === "percent" && (
         <div className="tool-unit-container">
           <input
             type="number"
-            className="tool-input"
+            className={`tool-input ${error ? "tool-input-error" : ""}`}
             value={value}
             min={min}
             max={max}
@@ -250,7 +258,7 @@ export function ToolInput({
         </div>
       )}
 
-      {/* FILE UPLOAD */}
+      {/* FILE */}
       {type === "file" && (
         <input
           type="file"
@@ -258,6 +266,9 @@ export function ToolInput({
           onChange={(e) => onChange(e.target.files?.[0] || null)}
         />
       )}
+
+      {/* ERROR MESSAGE (all types) */}
+      {error && <div className="tool-input-error-message">{error}</div>}
     </div>
   );
 }

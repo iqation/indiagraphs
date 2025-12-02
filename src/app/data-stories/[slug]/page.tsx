@@ -5,8 +5,6 @@ import * as he from "he";
 import CommentSection from "./CommentSection";
 import { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
-
 const WP_API = "https://cms.indiagraphs.com/wp-json/wp/v2";
 
 type FAQItem = {
@@ -157,45 +155,45 @@ function extractFaqFromRankMath(head: string): FAQItem[] {
 }
 
 // ---------------------------
-// Dynamic SEO Metadata
+// Dynamic SEO Metadata (Next.js 15 async params)
 // ---------------------------
-export async function generateMetadata({
-  params,
-}: {
-  params: any;
-}): Promise<Metadata> {
-  const { slug } = (await params) as { slug: string };
-  const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
+export async function generateMetadata(
+  props: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { params } = props;
+  const { slug } = await params;
 
-  const seo = await fetchRankMathSEO(fullUrl);
+  const canonicalUrl = `https://indiagraphs.com/data-stories/${slug}`;
+
+  // RankMath expects the WordPress URL (with /data-stories/ and trailing slash)
+  const wpUrl = `https://cms.indiagraphs.com/data-stories/${slug}/`;
+  const seo = await fetchRankMathSEO(wpUrl);
 
   let title = decodeHtmlEntities(seo.title || "");
   let description = decodeHtmlEntities(seo.description || "");
 
   if (!title || !description) {
-    try {
-      const story = await fetchStory(slug);
-      if (story) {
-        if (!title) title = decodeHtmlEntities(story.title?.rendered || "");
-        if (!description) {
-          const excerpt = (story.excerpt?.rendered || "").replace(/<[^>]+>/g, "");
-          description = decodeHtmlEntities(excerpt);
-        }
+    const story = await fetchStory(slug);
+    if (story) {
+      if (!title) title = decodeHtmlEntities(story.title?.rendered || "");
+      if (!description) {
+        const excerpt = (story.excerpt?.rendered || "").replace(/<[^>]+>/g, "");
+        description = decodeHtmlEntities(excerpt);
       }
-    } catch {}
+    }
   }
 
   return {
-    title: title || "",
-    description: description || "",
+    title: title || "Indiagraphs Data Story",
+    description: description || "Explore this data story on Indiagraphs.",
     alternates: {
-      canonical: seo.canonical || fullUrl,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title,
       description,
+      url: canonicalUrl,
       images: seo.ogImage ? [seo.ogImage] : [],
-      url: fullUrl,
       type: "article",
     },
     twitter: {
@@ -208,18 +206,22 @@ export async function generateMetadata({
 }
 
 // ---------------------------
-// Page Component
+// Page Component (Next.js 15 async params)
 // ---------------------------
-export default async function StoryPage({ params }: { params: any }) {
-  const { slug } = (await params) as { slug: string };
+export default async function StoryPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
 
   const story = await fetchStory(slug);
-
-  const fullUrl = `https://cms.indiagraphs.com/data-stories/${slug}`;
-  const seo = await fetchRankMathSEO(fullUrl);
-
-  const faqs = extractFaqFromRankMath(seo.head);
   if (!story) return <div className="p-20 text-center">Not found</div>;
+
+  // Use same WP URL for FAQ schema / SEO head
+  const wpUrl = `https://cms.indiagraphs.com/data-stories/${slug}/`;
+  const seo = await fetchRankMathSEO(wpUrl);
+  const faqs = extractFaqFromRankMath(seo.head);
 
   const related = await fetchRelatedStories(story.id);
   const title = he.decode(story.title.rendered);
@@ -345,8 +347,9 @@ export default async function StoryPage({ params }: { params: any }) {
             dangerouslySetInnerHTML={{ __html: content }}
           />
 
-          {/* FAQ section (from RankMath schema) */}
-       {/*   {faqs.length > 0 && (
+          {/* FAQ section (from RankMath schema) – optional; still commented if you don’t want UI */}
+          {/*
+          {faqs.length > 0 && (
             <section className="ig-faq mt-10">
               <h2 className="editorial-subtitle text-xl sm:text-2xl font-semibold mb-4 text-slate-900">
                 Frequently Asked Questions
@@ -366,8 +369,9 @@ export default async function StoryPage({ params }: { params: any }) {
                 ))}
               </div>
             </section>
-          )} */}
-        </div>  
+          )}
+          */}
+        </div>
 
         {/* Related stories */}
         {related.length > 0 && (
