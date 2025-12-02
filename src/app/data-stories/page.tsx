@@ -3,7 +3,8 @@ import IGFooter from "../components/IGFooter";
 import Link from "next/link";
 import he from "he";
 
-export const dynamic = "force-dynamic"; // ⭐ Prevent Vercel from prerendering
+// ⭐ Revalidate (ISR) every 5 minutes
+export const revalidate = 300; 
 
 const CATEGORY_ID = 191;
 const WP_API = `https://cms.indiagraphs.com/wp-json/wp/v2/posts?categories=${CATEGORY_ID}&per_page=20&_embed`;
@@ -16,10 +17,11 @@ function cleanExcerpt(html: string = "") {
   return text.replace(/\s+/g, " ").trim();
 }
 
-// SERVER COMPONENT
+// SERVER COMPONENT (fast + cached + SEO perfect)
 export default async function DataStoriesPage() {
   const res = await fetch(WP_API, {
-    cache: "no-store", // ⭐ Ensures runtime fetch, avoids build crashes
+    // ⭐ Allow Vercel to cache & revalidate
+    next: { revalidate: 300 }
   });
 
   const stories = await res.json();
