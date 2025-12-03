@@ -69,7 +69,12 @@ const fINR = (n: number) => `₹${fIN(n)}`;
    MAIN PAGE
 ------------------------------------------------------ */
 
-export default function SavingsComparisonPage() {
+type Props = {
+  isEmbed: boolean;
+};
+
+export default function SavingsComparisonPage({ isEmbed }: Props) {
+
   /* INPUT STATES */
   const [amount, setAmount] = useState("100000");
   const [years, setYears] = useState("10");
@@ -500,8 +505,7 @@ const trajectoryData = Array.from({ length: parseInt(years, 10) + 1 }, (_, i) =>
 
   return (
     <>
-      <IGHeader />
-
+      {!isEmbed && <IGHeader />}
       <ToolLayoutComparison
         title="Real Returns: Savings Schemes Comparison (India)"
         updated="Nov 2025"
@@ -768,7 +772,7 @@ const trajectoryData = Array.from({ length: parseInt(years, 10) + 1 }, (_, i) =>
 </section>
       </ToolLayoutComparison>
 
-      <IGFooter />
+      {!isEmbed && <IGFooter />}
     </>
   );
 }

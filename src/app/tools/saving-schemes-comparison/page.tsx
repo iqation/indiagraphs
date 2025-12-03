@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import ClientPage from "./ClientPage";
 
+// ----------- SEO METADATA (server) -----------
 export const metadata: Metadata = {
   title: "Savings Comparison Calculator (India) - Compare PPF, SSY, FD, NSC, SCSS",
   description:
@@ -22,7 +23,11 @@ export const metadata: Metadata = {
   },
 };
 
-// Server component → Only loads ClientPage
-export default function Page() {
-  return <ClientPage />;
+// ---------- SERVER COMPONENT WRAPPER ----------
+export default async function Page(props: { searchParams: Promise<{ embed?: string }> }) {
+  
+  const search = await props.searchParams;  // ⬅️ FIX
+  const isEmbed = search?.embed === "1";
+
+  return <ClientPage isEmbed={isEmbed} />;
 }

@@ -22,7 +22,11 @@ export const metadata: Metadata = {
   },
 };
 
-// ONLY RENDER CLIENT COMPONENT
-export default function Page() {
-  return <ClientPage />;
+// ---------- SERVER COMPONENT WRAPPER ----------
+export default async function Page(props: { searchParams: Promise<{ embed?: string }> }) {
+  
+  const search = await props.searchParams;  // ⬅️ FIX
+  const isEmbed = search?.embed === "1";
+
+  return <ClientPage isEmbed={isEmbed} />;
 }

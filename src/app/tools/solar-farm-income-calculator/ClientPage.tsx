@@ -8,19 +8,22 @@ import { ToolInput } from "../components/ToolInput";
 import { ToolOutput } from "../components/ToolOutput";
 import { validateNumberField } from "../utils/validation";
 
+
 import "../tools.css";
 
-
-
-// …the rest of your calculator code stays exactly as it is
-
-
+// ⭐ Add this EXACTLY here
+type Props = {
+  isEmbed: boolean;
+};
 
 // Format numbers with commas for India
 const formatIN = (n: number) =>
   Number.isFinite(n) ? n.toLocaleString("en-IN") : "0";
 
-export default function SolarFarmIncomeCalculatorPage() {
+export default function SolarFarmIncomeCalculatorPage({ isEmbed }: Props) {
+
+  // ⭐ Detect embed mode
+
   // Inputs
   const [area, setArea] = useState("");
   const [tariff, setTariff] = useState("");
@@ -206,10 +209,10 @@ function runValidation() {
  
   return (
     <>
-    <IGHeader />
+    {!isEmbed && <IGHeader />}
     <ToolLayout
       title="Solar Farm Income Calculator"
-      updated="Nov 2024"
+      updated="Nov 2025"
       categories={["Energy", "Solar", "Investments"]}
       breadcrumb={[
         { label: "Tools & Calculators", href: "/tools" },
@@ -404,7 +407,7 @@ function runValidation() {
         </section>
       </div>
     </ToolLayout>
-    <IGFooter />
+    {!isEmbed && <IGFooter />}
     </>
   );
 }

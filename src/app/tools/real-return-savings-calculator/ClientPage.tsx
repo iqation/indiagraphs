@@ -27,7 +27,13 @@ const KVP_EffectiveRate = () => {
 
 /** export const metadata = generateToolMetadata("real-return-savings-calculator"); */
 
-export default function RealReturnsCalculatorPage() {
+type Props = {
+  isEmbed: boolean;
+};
+
+export default function RealReturnsCalculatorPage({ isEmbed }: Props) {
+
+
   const [investmentType, setInvestmentType] = useState<"lumpsum" | "sip">(
     "lumpsum"
   ); // NEW: Lumpsum vs Monthly SIP
@@ -214,7 +220,7 @@ export default function RealReturnsCalculatorPage() {
 
   return (
     <>
-      <IGHeader />
+      {!isEmbed && <IGHeader />}
 
       <ToolLayout
         title="Real Returns Calculator (India)"
@@ -575,7 +581,7 @@ export default function RealReturnsCalculatorPage() {
         </div>
       </ToolLayout>
 
-      <IGFooter />
+       {!isEmbed && <IGFooter />}
     </>
   );
 }

@@ -112,6 +112,11 @@ export default function IGHeader() {
             Data Stories
           </Link>
 
+          {/* Data Tools */}
+<Link href="/tools" className="hover:text-indigo-600">
+  Data Tools
+</Link>
+
           {/* Solutions */}
           <div className="relative group">
             <button className="flex items-center gap-1 hover:text-indigo-600">
@@ -226,6 +231,13 @@ export default function IGHeader() {
               <Link href="/data-stories" className="block py-2 font-medium hover:text-indigo-600">
                 Data Stories
               </Link>
+
+<Link
+  href="/tools"
+  className="block py-2 font-medium hover:text-indigo-600"
+>
+  Data Tools
+</Link>
 
               {/* Render remaining sections */}
               {mobileSections.slice(1).map((section) => (
