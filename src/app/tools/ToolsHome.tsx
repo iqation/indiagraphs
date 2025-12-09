@@ -6,30 +6,32 @@ import { useMemo, useState } from "react";
 import IGHeader from "../components/IGHeader";
 import IGFooter from "../components/IGFooter";
 
-type Tool = {
+export type Tool = {
   slug: string;
   name: string;
-  category: string;
+  primaryCategory: string;
+  categories: string[];
   emoji: string;
   description: string;
   tags: string[];
 };
 
-// ✅ All calculators listed here
-const TOOLS: Tool[] = [
+export const TOOLS: Tool[] = [
   {
     slug: "/tools/solar-farm-income-calculator",
     name: "Solar Farm Income Calculator",
-    category: "Energy",
+    primaryCategory: "economy",
+    categories: ["Energy", "Solar", "Investments"],
     emoji: "☀️",
     description:
-      "Estimate annual solar plant revenue using CUF, tariff rate and MW/acre. Handy for farmers, investors and feasibility studies.",
+      "Estimate annual solar plant revenue using CUF, tariff rate and MW/acre.",
     tags: ["solar", "income", "energy", "farm", "renewable"],
   },
   {
     slug: "/tools/real-return-savings-calculator",
     name: "Real Returns Calculator",
-    category: "Finance",
+    primaryCategory: "small-savings",
+    categories: ["Finance", "Investments", "Inflation", "Real Returns"],
     emoji: "📈",
     description:
       "Calculate inflation-adjusted real returns for PPF, SSY, FD, NSC and SCSS.",
@@ -38,10 +40,11 @@ const TOOLS: Tool[] = [
   {
     slug: "/tools/saving-schemes-comparison",
     name: "Savings Schemes Comparison",
-    category: "Finance",
+    primaryCategory: "small-savings",
+    categories: ["Finance", "Investments", "Inflation"],
     emoji: "💰",
     description:
-      "Compare PPF vs SSY vs FD vs SCSS returns side-by-side. Helps you choose the best savings option.",
+      "Compare PPF vs SSY vs FD vs SCSS returns side-by-side.",
     tags: ["comparison", "savings", "returns", "PPF", "SCSS"],
   },
 ];
@@ -52,11 +55,14 @@ export default function ToolsHomeClient() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return TOOLS;
+
     return TOOLS.filter((tool) => {
       const haystack = (
         tool.name +
         " " +
-        tool.category +
+        tool.primaryCategory +
+        " " +
+        tool.categories.join(" ") +
         " " +
         tool.description +
         " " +
@@ -75,28 +81,26 @@ export default function ToolsHomeClient() {
     <>
       <IGHeader />
       <main className="w-full bg-[#f4f6fb]">
-        {/* Gradient hero band like Omni */}
+        {/* Hero Section */}
         <div className="w-full bg-gradient-to-br from-indigo-50 via-white to-sky-50 border-b border-slate-200/60">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              {/* Left hero text */}
+              
               <div>
                 <h1 className="text-3xl sm:text-4xl lg:text-[2.7rem] font-extrabold tracking-tight text-slate-900">
                   Indiagraphs Tools &amp; Calculators
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-600">
-                  Smart, India-focused calculators powered by real historical datasets and transparent assumptions 
-  built for accurate decision-making.
+                  Smart, India-focused calculators powered by real historical datasets 
+                  and transparent assumptions built for accurate decision-making.
                 </p>
               </div>
 
-              {/* Search on desktop sits to the right */}
               <div className="hidden sm:block lg:min-w-[320px]">
                 <SearchBox query={query} setQuery={setQuery} />
               </div>
             </div>
 
-            {/* Search on mobile (full width) */}
             <div className="mt-6 sm:hidden">
               <SearchBox query={query} setQuery={setQuery} />
             </div>
@@ -115,7 +119,7 @@ export default function ToolsHomeClient() {
               Try a different keyword like{" "}
               <span className="font-medium">solar</span>,{" "}
               <span className="font-medium">income</span>, or{" "}
-              <span className="font-medium">energy</span>.
+              <span className="font-medium">savings</span>.
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -125,7 +129,6 @@ export default function ToolsHomeClient() {
             </div>
           )}
 
-          {/* Small note at bottom */}
           <div className="mt-10 text-xs sm:text-sm text-slate-500">
             More calculators are being added steadily. If there’s a calculator you
             want to see on Indiagraphs, just drop us a note.
@@ -137,13 +140,7 @@ export default function ToolsHomeClient() {
   );
 }
 
-function SearchBox({
-  query,
-  setQuery,
-}: {
-  query: string;
-  setQuery: (v: string) => void;
-}) {
+function SearchBox({ query, setQuery }: { query: string; setQuery: (v: string) => void }) {
   return (
     <div className="relative">
       <input
@@ -154,28 +151,9 @@ function SearchBox({
         placeholder="Search tools e.g. solar, income..."
       />
       <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="h-4 w-4 sm:h-5 sm:w-5"
-        >
-          <circle
-            cx="11"
-            cy="11"
-            r="6"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-          />
-          <line
-            x1="15.5"
-            y1="15.5"
-            x2="20"
-            y2="20"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5">
+          <circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+          <line x1="15.5" y1="15.5" x2="20" y2="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </span>
     </div>
@@ -188,27 +166,23 @@ function ToolCard({ tool }: { tool: Tool }) {
       href={tool.slug}
       className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md"
     >
-      {/* Emoji + category */}
       <div className="mb-3 flex items-center gap-2 text-xs sm:text-sm">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-base">
           {tool.emoji}
         </span>
         <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium text-indigo-700">
-          {tool.category}
+          {tool.primaryCategory} {/* ⭐ UPDATED */}
         </span>
       </div>
 
-      {/* Title */}
       <h2 className="text-sm sm:text-base font-semibold leading-snug text-slate-900">
         {tool.name}
       </h2>
 
-      {/* Description */}
       <p className="mt-2 text-xs sm:text-sm text-slate-600 line-clamp-3">
         {tool.description}
       </p>
 
-      {/* Footer row */}
       <div className="mt-4 flex items-center justify-between text-xs sm:text-sm">
         <div className="flex flex-wrap gap-1">
           {tool.tags.slice(0, 3).map((tag) => (
@@ -221,10 +195,7 @@ function ToolCard({ tool }: { tool: Tool }) {
           ))}
         </div>
         <span className="ml-2 inline-flex items-center text-[11px] sm:text-xs font-semibold text-indigo-600 group-hover:text-indigo-700">
-          Open
-          <span className="ml-1 transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
+          Open →
         </span>
       </div>
     </Link>
