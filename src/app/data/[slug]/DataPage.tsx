@@ -390,6 +390,7 @@ const validValues = values.filter((v) => !isNaN(v));
 
 {/* ⭐ Related Tools & Stories (headlines outside cards) */}
 <section className="mt-10 space-y-6">
+  
   <div>
      <h3 className="text-lg font-semibold text-indigo-900 mb-3">Related Tools</h3>
    

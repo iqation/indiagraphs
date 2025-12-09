@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: { params: any }) {
   const title = `${graph.title}${yearRange ? ` (${yearRange})` : ""}${sourceText}`;
   const description = `${graph.description || ""} ${yearRange ? `Covers ${yearRange}.` : ""} ${sourceText}`;
 
-  const ogImage = `https://data.indiagraphs.com/og-images/${slug}.jpg`;
+  const ogImage = `https://indiagraphs.com/data/og-images/${slug}.jpg`;
 
   return {
     title,

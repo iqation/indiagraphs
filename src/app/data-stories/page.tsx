@@ -8,7 +8,7 @@ export const revalidate = false;      // ❌ no ISR
 export const fetchCache = "only-cache"; // static fetch at build
 
 const CATEGORY_ID = 191;
-const WP_API = `https://cms.indiagraphs.com/wp-json/wp/v2/posts?categories=${CATEGORY_ID}&per_page=20&_embed`;
+const WP_API = `https://cms.indiagraphs.com/wp-json/wp/v2/posts?categories=${CATEGORY_ID}&per_page=24&_embed`;
 
 // Clean excerpt
 function cleanExcerpt(html: string = "") {
