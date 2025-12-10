@@ -377,7 +377,7 @@ const validValues = values.filter((v) => !isNaN(v));
           </section>
 
           {/* Auto Insight */}
-<AskThisGraph graphData={graph} />
+<AskThisGraph graphData={graph} activeDatasetId={activeDatasetId} />
 
 
           {/* About */}
@@ -388,25 +388,11 @@ const validValues = values.filter((v) => !isNaN(v));
   category={graph.category}
 />
 
-{/* ⭐ Related Tools & Stories (headlines outside cards) */}
-<section className="mt-10 space-y-6">
-  
-  <div>
-     <h3 className="text-lg font-semibold text-indigo-900 mb-3">Related Tools</h3>
-   
-    <RelatedTools category={graph.category} />
-  </div>
-
-  {relatedStories.length > 0 && (
-    <div>
-      <h3 className="text-lg font-semibold text-indigo-900 mb-3">
-        Popular Data Stories
-      </h3>
-      <RelatedStories stories={relatedStories} />
-    </div>
-  )}
+{/* ⭐ Related Tools & Stories */}
+<section className="mt-10 space-y-8">
+  <RelatedTools category={graph.category} />
+  <RelatedStories stories={relatedStories} />
 </section>
-
 
 
           {/* Related */}

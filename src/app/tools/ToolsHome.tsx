@@ -22,7 +22,7 @@ export const TOOLS: Tool[] = [
     name: "Solar Farm Income Calculator",
     primaryCategory: "economy",
     categories: ["Energy", "Solar", "Investments"],
-    emoji: "☀️",
+    emoji: "",
     description:
       "Estimate annual solar plant revenue using CUF, tariff rate and MW/acre.",
     tags: ["solar", "income", "energy", "farm", "renewable"],
@@ -32,7 +32,7 @@ export const TOOLS: Tool[] = [
     name: "Real Returns Calculator",
     primaryCategory: "small-savings",
     categories: ["Finance", "Investments", "Inflation", "Real Returns"],
-    emoji: "📈",
+    emoji: "",
     description:
       "Calculate inflation-adjusted real returns for PPF, SSY, FD, NSC and SCSS.",
     tags: ["real returns", "inflation", "PPF", "FD", "finance"],
@@ -42,7 +42,7 @@ export const TOOLS: Tool[] = [
     name: "Savings Schemes Comparison",
     primaryCategory: "small-savings",
     categories: ["Finance", "Investments", "Inflation"],
-    emoji: "💰",
+    emoji: "",
     description:
       "Compare PPF vs SSY vs FD vs SCSS returns side-by-side.",
     tags: ["comparison", "savings", "returns", "PPF", "SCSS"],
@@ -167,9 +167,9 @@ function ToolCard({ tool }: { tool: Tool }) {
       className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md"
     >
       <div className="mb-3 flex items-center gap-2 text-xs sm:text-sm">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-base">
+       {/* <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-base">
           {tool.emoji}
-        </span>
+        </span> */} 
         <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium text-indigo-700">
           {tool.primaryCategory} {/* ⭐ UPDATED */}
         </span>
