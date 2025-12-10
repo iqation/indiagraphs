@@ -3,14 +3,14 @@ import IGFooter from "../components/IGFooter";
 import Link from "next/link";
 import he from "he";
 
-export const dynamic = "error";       // ❌ no runtime rendering
-export const revalidate = false;      // ❌ no ISR
-export const fetchCache = "only-cache"; // static fetch at build
+export const revalidate = 300;   // ✅ ISR: regenerate every 5 minutes
+export const dynamic = "force-static"; // ✅ static but safe
+export const fetchCache = "force-cache";
 
 const CATEGORY_ID = 191;
 const WP_API = `https://cms.indiagraphs.com/wp-json/wp/v2/posts?categories=${CATEGORY_ID}&per_page=24&_embed`;
 
-// Clean excerpt
+// Clean excerpt helper
 function cleanExcerpt(html: string = "") {
   if (!html) return "";
   let text = html.replace(/<[^>]+>/g, " ");
@@ -19,12 +19,21 @@ function cleanExcerpt(html: string = "") {
 }
 
 export default async function DataStoriesPage() {
-  // ⭐ Fetch ONCE at build time
-  const res = await fetch(WP_API, {
-    cache: "force-cache",     // build-time cache
-  });
+  let stories: any[] = [];
 
-  const stories = await res.json();
+  try {
+    const res = await fetch(WP_API, {
+      cache: "force-cache",
+      next: { revalidate: 300 }, // 💡 fallback safety
+    });
+
+    if (!res.ok) throw new Error("WP API not OK");
+
+    stories = await res.json();
+  } catch (err) {
+    console.error("⚠️ Failed to fetch stories at build/runtime:", err);
+    stories = []; // ✅ graceful fallback, no crash
+  }
 
   return (
     <>
@@ -35,11 +44,15 @@ export default async function DataStoriesPage() {
           Data Stories
         </h1>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stories.map((story: any) => (
-            <StoryCard key={story.id} story={story} />
-          ))}
-        </div>
+        {stories.length === 0 ? (
+          <p className="text-slate-500">Stories are temporarily unavailable.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stories.map((story: any) => (
+              <StoryCard key={story.id} story={story} />
+            ))}
+          </div>
+        )}
       </main>
 
       <IGFooter />
@@ -48,7 +61,8 @@ export default async function DataStoriesPage() {
 }
 
 function StoryCard({ story }: { story: any }) {
-  const featured = story._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+  const featured =
+    story._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null;
 
   return (
     <Link
@@ -66,9 +80,7 @@ function StoryCard({ story }: { story: any }) {
       <div className="p-4">
         <h2
           className="text-lg font-bold text-slate-900 leading-snug"
-          dangerouslySetInnerHTML={{
-            __html: story.title.rendered,
-          }}
+          dangerouslySetInnerHTML={{ __html: story.title.rendered }}
         />
 
         <p className="text-slate-600 text-sm mt-2 line-clamp-3">
