@@ -5,6 +5,10 @@ import "./globals.css";
 import "./editorial.css";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "@/app/account/styles/globals.scss";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,7 +61,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "India's Data Stories, Interactive Graphs & Insights | Indiagraphs",
-    description: "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
+    description:
+      "Explore India's economy, markets, society, and government data through interactive charts, visual stories, and insights powered by trusted official sources.",
     creator: "@indiagraphs",
     images: ["/og-image.jpg"],
   },
@@ -70,12 +75,7 @@ export const metadata: Metadata = {
   },
 };
 
-
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -101,7 +101,9 @@ export default function RootLayout({
         </Script>
       </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {/* GTM noscript */}
         <noscript>
           <iframe
@@ -113,6 +115,7 @@ export default function RootLayout({
         </noscript>
 
         {children}
+        <ToastContainer position="top-right" autoClose={2500} />
       </body>
     </html>
   );

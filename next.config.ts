@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  productionBrowserSourceMaps: false,
   images: {
     remotePatterns: [
       {
@@ -12,17 +13,17 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.indiagraphs.com",
         pathname: "/wp-content/uploads/**",
-      }
+      },
     ],
   },
 
   async redirects() {
-    return [{
+    return [
+      {
         source: "/tools/solar-income-calculator/",
         destination: "/tools/solar-farm-income-calculator",
         permanent: true,
-      }
-    
+      },
     ];
   },
 };
