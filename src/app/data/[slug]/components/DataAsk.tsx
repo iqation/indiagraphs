@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
 
-export default function AskThisGraph({ graphData }: { graphData: any }) {
+export default function AskThisGraph({
+  graphData,
+  activeDatasetId
+}: {
+  graphData: any;
+  activeDatasetId: number | null;
+}) {
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState<string | null>(null);
 
@@ -13,8 +19,12 @@ export default function AskThisGraph({ graphData }: { graphData: any }) {
       const res = await fetch("/api/ask-graph", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ graph: graphData }),
+        body: JSON.stringify({
+          graph: graphData,
+          activeDatasetId: activeDatasetId   // ⭐ send dataset ID to backend
+        }),
       });
+
       const data = await res.json();
       setInsight(data.answer || "No clear insight generated.");
     } catch (err) {

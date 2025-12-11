@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const WP_URL = "https://indiagraphs.com/wp-json/wp/v2/comments";
+const WP_URL = "https://cms.indiagraphs.com/wp-json/wp/v2/comments";
 
 export async function POST(request: Request) {
   const body = await request.json();

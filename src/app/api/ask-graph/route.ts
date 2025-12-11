@@ -5,22 +5,48 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function POST(req: Request) {
   try {
-    const { graph } = await req.json();
-    const { title, category, datasets } = graph;
-    const dataset = datasets?.[0];
+    const { graph, activeDatasetId } = await req.json();
+
+    const {
+      title,
+      description = "",
+      category,
+      source = "",
+      datasets = [],
+      country = "India",
+    } = graph;
+
+    // ✅ Select correct dataset based on activeDatasetId
+    const dataset =
+      datasets.find((d: any) => d.id === activeDatasetId) || datasets[0];
+
     const points = dataset?.data_points || [];
     const unit = dataset?.unit || "";
+    const metricBehavior =
+      dataset?.metric_behavior || dataset?.metric_type || "value";
 
-    // ✅ Sort datapoints chronologically
+    if (!points.length) {
+      return NextResponse.json(
+        { error: "No datapoints available for this graph." },
+        { status: 400 }
+      );
+    }
+
+    // -------------------------------
+    // SORT DATA CHRONOLOGICALLY
+    // -------------------------------
     function extractYear(label: string): number {
       if (!label) return 0;
+
       const years = label.match(/\d{4}/g)?.map(Number);
       if (years?.length) return Math.max(...years);
+
       const fyMatch = label.match(/FY\s?(\d{2})/i);
       if (fyMatch) {
-        const yr = parseInt(fyMatch[1]);
+        const yr = parseInt(fyMatch[1], 10);
         return yr < 50 ? 2000 + yr : 1900 + yr;
       }
+
       return 0;
     }
 
@@ -28,48 +54,54 @@ export async function POST(req: Request) {
       (a, b) => extractYear(a.period_label) - extractYear(b.period_label)
     );
 
-    // ✅ Build summary
-    const summary = sortedPoints
+    const compactSeries = sortedPoints.map((p: any) => ({
+      period: p.period_label,
+      value: p.value,
+    }));
+
+    const first = compactSeries[0];
+    const latest = compactSeries[compactSeries.length - 1];
+
+    const seriesPreview = compactSeries
       .slice(-40)
-      .map((p: any) => `${p.period_label}: ${p.value}`)
+      .map((p) => `${p.period}: ${p.value}`)
       .join(", ");
 
-    // ✅ Improved prompt — includes unit & anti-hallucination rules
+    // -------------------------------
+    // PROMPT
+    // -------------------------------
     const prompt = `
 You are Indiagraphs’ data insight analyst.
-You write short, factual explanations of Indian public datasets.
+You explain Indian public datasets in clear, factual language.
+
+ACTIVE DATASET NAME: ${dataset.name}
+UNIT: ${unit}
+
+TIME SERIES (earliest → latest):
+${seriesPreview}
+
+First point: ${first.period} = ${first.value} ${unit}
+Latest point: ${latest.period} = ${latest.value} ${unit}
 
 TASK:
-Explain what this dataset shows — in 2–3 concise, neutral sentences (<50 words).
-Your answer must be purely data-driven, using the provided data and unit.
-
-DATA:
-Title: ${title}
-Category: ${category}
-Unit: ${unit || "Not specified"}
-Recent values (oldest → latest): ${summary}
+Write a short 2–3 sentence explanation (<60 words) of what this dataset shows.
 
 RULES:
-- The last value represents the most recent year — treat it as the latest point.
-- Always report values using the provided unit (“${unit}”) exactly as written.
-- Do NOT assume or convert to USD, million, billion, or any other unit.
-- Focus only on visible data, not predictions or external causes.
-- Mention direction of change (rising / falling / stable) and first vs latest value.
-- If the dataset is short (<5 points), say “shows limited variation over time.”
-- Keep tone factual, professional, and simple enough for general readers.
-
-Example output:
-Between 1991 and 2025, India’s gross external debt rose from ₹163,001 crore to ₹6,303,630 crore, showing a steady upward trend with faster growth after 2008.
+- Mention whether values rise, fall, stay flat, or are volatile.
+- Mention first and last values with unit.
+- Stick strictly to the data.
+- No forecasting, no guessing causes, no policy or event assumptions.
+- No investment advice.
 `;
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.5,
+      temperature: 0.4,
       max_tokens: 180,
     });
 
-    const answer = completion.choices[0]?.message?.content?.trim();
+    const answer = completion.choices[0]?.message?.content?.trim() || "";
     return NextResponse.json({ answer });
   } catch (err) {
     console.error("ask-graph error:", err);

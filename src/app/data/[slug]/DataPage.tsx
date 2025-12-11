@@ -14,6 +14,7 @@ import GraphStats from "./components/DataStats";
 import GraphChart from "./components/DataChart";
 import GraphAbout from "./components/DataAbout";
 import RelatedGraphs from "./components/DataRelated";
+import { RelatedTools, RelatedStories } from "./components/RelatedContent"; 
 import { metricBehaviorLogic } from "../../config/metricBehaviorLogic";
 import AskThisGraph from "./components/DataAsk";
 //import IGHeader from "@/app/components/IGHeader";
@@ -39,6 +40,7 @@ export default function DataPage({ slug }: { slug: string }) {
     { title: string; slug: string }[]
   >([]);
   const [activeDatasetId, setActiveDatasetId] = useState<number | null>(null);
+  const [relatedStories, setRelatedStories] = useState<any[]>([]);
 
   
   // 🧩 Define dataset + datapoint shape for TypeScript
@@ -69,6 +71,7 @@ useEffect(() => {
   console.error("❌ Invalid slug provided to fetchGraph:", slug);
   return;
 }
+
 
 const apiUrl = `/api/graph/${encodeURIComponent(slug)}`;
 const res = await fetch(apiUrl, { cache: "no-store" });
@@ -112,14 +115,36 @@ const res = await fetch(apiUrl, { cache: "no-store" });
         setRelatedGraphs(related || []);
       }
 
+      // Fetch related stories from WordPress
+try {
+  const storyRes = await fetch(
+    `https://cms.indiagraphs.com/wp-json/wp/v2/posts?categories=191&per_page=4&_embed`
+  );
+
+  const storyJson = await storyRes.json();
+
+  const mapped = storyJson.map((s: any) => ({
+    title: s.title.rendered,
+    slug: s.slug,
+    cover: s._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
+  }));
+
+  setRelatedStories(mapped);
+} catch (err) {
+  console.warn("Failed to load related stories", err);
+}
+
       setLoading(false);
     } catch (err) {
       console.error("❌ Error fetching graph:", err);
       setLoading(false);
     }
+    
   }
 
+  
   if (slug) fetchGraph();
+  
 }, [slug]);
 
 
@@ -223,6 +248,9 @@ const values = activeData.map((d) => d.value);
     overflow: "visible",
   }}
 >
+
+
+
         <div className="mx-auto w-full max-w-[940px] px-5 sm:px-6 space-y-6 sm:space-y-7">
           {/* Breadcrumb */}
           <BreadcrumbHeader category={graph.category} />
@@ -349,7 +377,7 @@ const validValues = values.filter((v) => !isNaN(v));
           </section>
 
           {/* Auto Insight */}
-<AskThisGraph graphData={graph} />
+<AskThisGraph graphData={graph} activeDatasetId={activeDatasetId} />
 
 
           {/* About */}
@@ -359,6 +387,13 @@ const validValues = values.filter((v) => !isNaN(v));
   metricBehavior={activeDataset?.metric_behavior}
   category={graph.category}
 />
+
+{/* ⭐ Related Tools & Stories */}
+<section className="mt-10 space-y-8">
+  <RelatedTools category={graph.category} />
+  <RelatedStories stories={relatedStories} />
+</section>
+
 
           {/* Related */}
           <RelatedGraphs related={relatedGraphs} />
