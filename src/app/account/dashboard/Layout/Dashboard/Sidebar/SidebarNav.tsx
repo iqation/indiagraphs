@@ -37,12 +37,15 @@ export default async function SidebarNav() {
   const dict = await getDictionary();
   return (
     <ul className="list-unstyled">
-      <SidebarNavItem icon={faGauge} href="/">
+      <SidebarNavItem icon={faGauge} href="/account/dashboard">
         {dict.sidebar.items.dashboard}
       </SidebarNavItem>
 
-      <SidebarNavTitle>{dict.sidebar.items.components}</SidebarNavTitle>
+      <SidebarNavItem icon={faChartPie} href="/account/dashboard/demo">
+        {dict.sidebar.items.charts}
+      </SidebarNavItem>
 
+      <SidebarNavTitle>{dict.sidebar.items.components}</SidebarNavTitle>
       <SidebarNavGroup
         toggleIcon={faPuzzlePiece}
         toggleText={dict.sidebar.items.base}
@@ -53,9 +56,7 @@ export default async function SidebarNav() {
         </SidebarNavItem>
       </SidebarNavGroup>
 
-      <SidebarNavItem icon={faChartPie} href="#">
-        {dict.sidebar.items.charts}
-      </SidebarNavItem>
+      
     </ul>
   );
 }
